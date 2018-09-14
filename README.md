@@ -49,18 +49,18 @@
         ```
     * CREATE INDEX - 创建索引（搜索键）
 
-    在表中创建索引，以便更加快速高效地查询数据。
+        在表中创建索引，以便更加快速高效地查询数据。
 
-    用户无法看到索引，它们只能被用来加速搜索/查询。
+        用户无法看到索引，它们只能被用来加速搜索/查询。
 
-    更新一个包含索引的表需要比更新一个没有索引的表花费更多的时间，这是由于索引本身也需要更新。因此，理想的做法是仅仅在常常被搜索的列（以及表）上面创建索引。
+        更新一个包含索引的表需要比更新一个没有索引的表花费更多的时间，这是由于索引本身也需要更新。因此，理想的做法是仅仅在常常被搜索的列（以及表）上面创建索引。
 
         ```sql
             CREATE INDEX index_name ON table_name (column_name);
             CREATE UNIQUE INDEX index_name ON table_name (column_name)
         ```
 
-    [详细了解索引](https://www.cnblogs.com/hyd1213126/p/5828937.html)
+        [详细了解索引](https://www.cnblogs.com/hyd1213126/p/5828937.html)
 
     * DROP INDEX - 删除索引
 

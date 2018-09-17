@@ -66,19 +66,96 @@
 
 2. SQL更多用法：
 
-    * 选中前x条记录
+    * like与通配符
 
-    * like
-
-    * 通配符
+        ```sql
+            SELECT * FROM Websites WHERE name LIKE 'G%';
+            --选取 name 以 "G"、"F" 或 "s" 开始
+            SELECT * FROM Websites WHERE name REGEXP '^[GFs]';
+            --选取 name 以 A 到 H 字母开头
+            SELECT * FROM Websites WHERE name REGEXP '^[A-H]';
+            --选取 name 不以 A 到 H 字母开头
+            SELECT * FROM Websites WHERE name REGEXP '^[^A-H]';
+            --将搜索下列字符串：Carsen、Karsen、Carson 和 Karson（如 Carson）。
+            SELECT * FROM Websites WHERE name LIKE '[CK]ars[eo]n';
+            --将搜索以字符串 inger 结尾、以从 M 到 Z 的任何单个字母开头的所有名称（如 Ringer）。
+            SELECT * FROM Websites WHERE name LIKE '[M-Z]inger';
+            --将搜索以字母 M 开头，并且第二个字母不是 c 的所有名称（如MacFeather）。
+            SELECT * FROM Websites WHERE name LIKE 'M[^c]%';
+            --'%a'          以a结尾的数据
+            --'a%'          以a开头的数据
+            --'%a%'         含有a的数据
+            --'_a_'         三位且中间字母是a的
+            --'_a'          两位且结尾字母是a的
+            --'a_'          两位且开头字母是a的
+            --[charlist]	字符列中的任何单一字符
+            --[^charlist]   不在字符列中的任何单一字符
+            --[!charlist]	不在字符列中的任何单一字符
+        ```
 
     * in
 
+        ```sql
+            select * from Websites where name in ('value1','value2');
+            select * from Websites where name='value1' or name='value2';
+            --mysql会转化为exists，弊端：a表(外表)使用不了索引，必须全表扫描，因为是拿a表的数据到b表查。而且必须得使用a表的数据到b表中查（外表到里表中），顺序是固定死的。
+            select * from a where exists(select * from b where b.id=a.id );
+        ```
+
+        in的效率提升
+        ```sql
+            select * from a where id in (select id from b );
+            改为
+            select * from a inner join b on a.id=b.id; 
+        ```
+
+        如果in条件规模小，则考虑使用in，否则考虑使用inner join
+
     * between
+
+        mysql和mssql 字母和数字包含边界值,日期不包含右边界，因为‘2016-05-14’为‘2016-05-14 00:00:00’，所以不包含结束当天。
+
+        ```sql
+            SELECT column_name(s) FROM table_name WHERE column_name BETWEEN value1 AND value2;
+            SELECT * FROM Websites WHERE alexa NOT BETWEEN 1 AND 20;
+            SELECT * FROM Websites WHERE name BETWEEN 'A' AND 'H';
+            SELECT * FROM Websites WHERE name NOT BETWEEN 'A' AND 'H';
+            SELECT * FROM access_log WHERE date BETWEEN '2016-05-10' AND '2016-05-14';
+        ```
 
     * as
 
+        在下面的情况下，使用别名很有用：
+        * 在查询中涉及超过一个表
+        * 在查询中使用了函数
+        * 列名称很长或者可读性差
+        * 需要把两个列或者多个列结合在一起
+
+        ```sql
+            SELECT column_name AS column_alias_name FROM table_name AS table_alias_name;
+        ```
+
     * join
+
+        * INNER JOIN：如果表中有至少一个匹配，则返回行
+        * LEFT JOIN：即使右表中没有匹配，也从左表返回所有的行
+        * RIGHT JOIN：即使左表中没有匹配，也从右表返回所有的行
+        * FULL OUTER JOIN：只要其中一个表中存在匹配，则返回行(MySQL中不支持 FULL OUTER JOIN,使用UNION实现)
+
+        ```sql
+            --on条件成立，且table1与table2不能出现null，组合成新表
+            SELECT column_name(s) FROM table1 INNER JOIN table2 ON table1.column_name=table2.column_name;
+            --on条件成立，且table1不能出现null，table2可出现null，组合成新表
+            SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name;
+            --on条件成立，且table1可出现null，table2不能出现null，组合成新表
+            SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name;
+            --on条件成立，且table1与table2可出现null，组合成新表
+            SELECT column_name(s) FROM table1 FULL OUTER JOIN table2 ON table1.column_name=table2.column_name;
+            --mysql实现FULL OUTER JOIN
+            SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name
+            UNION
+            SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name
+        ```
 
     * union
 
@@ -254,6 +331,11 @@ set auto_shrink on
 ALTER TABLE table_name DROP INDEX index_name
 ```
 
+6. 查询10-20条记录
+```sql
+select top10 * from (select top 20 * from order by column) order by column desc
+```
+
 [详细了解mysql索引](https://www.cnblogs.com/whgk/p/6179612.html)
 
 ### MsSQL
@@ -338,6 +420,11 @@ modify file
 5. 删除表索引
 ```sql
 DROP INDEX table_name.index_name
+```
+
+6. 查询10-20条记录
+```sql
+select * from tablename where LIMIT 9,10
 ```
 
 [详细了解mssql索引](https://www.cnblogs.com/Brambling/p/6754993.html)

@@ -64,6 +64,41 @@
 
     * DROP INDEX - 删除索引
 
+2. SQL更多用法：
+
+    * 选中前x条记录
+
+    * like
+
+    * 通配符
+
+    * in
+
+    * between
+
+    * as
+
+    * join
+
+    * union
+
+    * select into
+
+    * insert into select
+
+    * 约束
+
+    * drop
+
+    * 视图
+
+    * is
+
+    * 数据类型
+
+3. SQL函数
+
+
 ## 关系型数据库
 
 MySQL使用MySQL Workbench,MsSQL使用MicroSoft SQL Server Management Studio，进行图形化操作数据库。

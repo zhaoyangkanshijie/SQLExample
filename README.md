@@ -315,6 +315,104 @@
 
 3. SQL函数
 
+    SQL Aggregate 函数计算从列中取得的值，返回一个单一的值。
+    * AVG() - 返回平均值
+    
+        ```sql
+            SELECT site_id, count FROM access_log WHERE count > (SELECT AVG(count) FROM access_log);
+        ```
+
+    * COUNT() - 返回行数
+
+        ```sql
+            SELECT COUNT(column_name) FROM table_name;--排除null
+            SELECT COUNT(*) FROM table_name;
+            SELECT COUNT(DISTINCT column_name) FROM table_name;--不同值
+        ```
+
+    * MAX() - 返回最大值
+
+        ```sql
+            SELECT MAX(column_name) FROM table_name;
+        ```
+
+    * MIN() - 返回最小值
+
+        ```sql
+            SELECT MIN(column_name) FROM table_name;
+        ```
+        
+    * SUM() - 返回总和
+
+        ```sql
+            SELECT SUM(column_name) FROM table_name;
+        ```
+        
+
+    SQL Scalar 函数基于输入值，返回一个单一的值。
+    * UCASE() - 将某个字段转换为大写
+
+        ```sql
+            SELECT UCASE(column_name) FROM table_name;
+            --mssql
+            SELECT UPPER(column_name) FROM table_name;
+        ```
+        
+    * LCASE() - 将某个字段转换为小写
+
+        ```sql
+            SELECT LCASE(column_name) FROM table_name;
+            --mssql
+            SELECT LOWER(column_name) FROM table_name;
+        ```
+        
+    * MID() - 从某个文本字段提取从start开始的length个字符，MySql 中使用
+
+        ```sql
+            SELECT MID(column_name,start[,length]) FROM table_name;
+        ```
+        
+    * SubString(字段，1，end) - 从某个文本字段提取字符
+    * LEN() - 返回某个文本字段的长度
+
+        ```sql
+            SELECT LEN(column_name) FROM table_name;
+            --mysql
+            SELECT LENGTH(column_name) FROM table_name;
+        ```
+        
+    * ROUND() - 对某个数值字段进行指定小数位数的四舍五入
+
+        ```sql
+            SELECT ROUND(column_name,decimals) FROM table_name;
+        ```
+        
+    * NOW() - 返回当前的系统日期和时间
+
+        ```sql
+            SELECT name, url, Now() AS date FROM Websites;
+        ```
+        
+    * FORMAT() - 格式化某个字段的显示方式
+
+        ```sql
+            SELECT name, url, DATE_FORMAT(Now(),'%Y-%m-%d') AS date FROM Websites;
+        ```
+        
+
+    聚合
+    * GROUP BY
+
+        ```sql
+            SELECT site_id, SUM(access_log.count) AS nums FROM access_log GROUP BY site_id;
+        ```
+        
+    * HAVING
+
+        ```sql
+            SELECT Websites.name, Websites.url, SUM(access_log.count) AS nums FROM (access_log INNER JOIN Websites ON access_log.site_id=Websites.id) GROUP BY Websites.name HAVING SUM(access_log.count) > 200;
+        ```
+        
 
 ## 关系型数据库
 

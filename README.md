@@ -264,6 +264,17 @@
 
     * 视图
 
+        视图是基于 SQL 语句的结果集的可视化的表。
+        视图包含行和列，就像一个真实的表。视图中的字段就是来自一个或多个数据库中的真实的表中的字段。
+
+        ```sql
+            CREATE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition;
+            CREATE VIEW [Products Above Average Price] AS SELECT ProductName,UnitPrice FROM Products WHERE UnitPrice>(SELECT AVG(UnitPrice) FROM Products)
+
+            CREATE OR REPLACE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition
+            DROP VIEW view_name
+        ```
+
     * is
 
     * 数据类型

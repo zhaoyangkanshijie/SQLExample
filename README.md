@@ -277,7 +277,41 @@
 
     * is
 
+        ```sql
+            SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NULL;
+            SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NOT NULL
+        ```
+
     * 数据类型
+
+        |   数据类型   |          解析             |   mssql   |   mysql   |
+        |-------------|--------------------------|-----------|-----------|
+        |CHARACTER(n) |字符/字符串。固定长度 n。     |           |           |
+        |VARCHAR(n) 或CHARACTER VARYING(n)|字符/字符串。可变长度。最大长度 n。|||
+        |BINARY(n)    |二进制串。固定长度 n。       |           |            |
+        |BOOLEAN	  |存储 TRUE 或 FALSE 值      |    bit    | tinyint(1) |
+        |VARBINARY(n) 或 BINARY VARYING(n)|二进制串。可变长度。最大长度 n。|||
+        |INTEGER(p)	  |整数值（没有小数点）。精度 p。 |           |            |
+        |SMALLINT	  |整数值（没有小数点）。精度 5。 |           |            |
+        |INTEGER	  |整数值（没有小数点）。精度 10。|    int    |int/integer |
+        |BIGINT	      |整数值（没有小数点）。精度 19。|           |            |
+        |DECIMAL(p,s) |精确数值，精度 p，小数点后位数 s。例如：decimal(5,2) 是一个小数点前有 3 位数小数点后有 2 位数的数字。         |           |            |
+        |NUMERIC(p,s) |精确数值，精度 p，小数点后位数 s。（与 DECIMAL 相同）|||
+        |FLOAT(p)     |近似数值，尾数精度 p。一个采用以 10 为基数的指数计数法的浮点数。该类型的 size 参数由一个指定最小精度的单一数字组成。|           |           |
+        |REAL         |近似数值，尾数精度 7。        |           |            |
+        |FLOAT        |近似数值，尾数精度 16。       |Float/Real |   Float    |
+        |DOUBLE PRECISION|近似数值，尾数精度 16。    |           |            |
+        |DATE         |存储年、月、日的值。          |           |            |
+        |TIME         |存储小时、分、秒的值。         |           |            |
+        |TIMESTAMP    |存储年、月、日、小时、分、秒的值。|           |           |
+        |INTERVAL     |由一些整数字段组成，代表一段时间，取决于区间的类型。|||
+        |ARRAY        |元素的固定长度的有序集合       |           |            |
+        |MULTISET     |元素的可变长度的无序集合       |           |            |
+        |XML          |存储 XML 数据               |           |            |
+        |Currency     |货币                        |    Money  |numeric(15,4)|
+        |string (fixed)|固定长度字符串              |    Char   |    Char    |
+        |string (variable)|可变长度字符串           |  Varchar  |  Varchar   |
+        |binary object|二进制对象                  |Binary (fixed up to 8K) /Varbinary (<8K)/Image (<2GB)| Blob/Text |
 
 3. SQL函数
 
@@ -444,6 +478,53 @@ select top10 * from (select top 20 * from order by column) order by column desc
 
 [详细了解mysql索引](https://www.cnblogs.com/whgk/p/6179612.html)
 
+7. 处理NULL值为0
+```sql
+SELECT ProductName,UnitPrice*(UnitsInStock+ISNULL(UnitsOnOrder,0)) FROM Products
+```
+
+8. 数据类型
+
+|    数据类型    |                      解析                      |     储存    |
+|--------------|------------------------------------------------|------------|
+|char(n)	   |固定长度的字符串。最多 8,000 个字符。                |     n      |
+|varchar(n)    |可变长度的字符串。最多 8,000 个字符。                |2 bytes + n |
+|varchar(max)  |可变长度的字符串。最多 1,073,741,824 个字符。        |2 bytes + n |
+|text          |可变长度的字符串。最多 2GB 文本数据。                |4 bytes + n |
+|nchar         |固定长度的 Unicode 字符串。最多 4,000 个字符。       |     2n     |
+|nvarchar      |可变长度的 Unicode 字符串。最多 4,000 个字符。       |            |
+|nvarchar(max) |可变长度的 Unicode 字符串。最多 536,870,912 个字符。 |            |
+|ntext         |可变长度的 Unicode 字符串。最多 2GB 文本数据。	     |            |
+|bit           |允许 0、1 或 NULL                                |            |
+|binary(n)     |固定长度的二进制字符串。最多 8,000 字节。             |            |
+|varbinary     |可变长度的二进制字符串。最多 8,000 字节。             |            |
+|varbinary(max)|可变长度的二进制字符串。最多 2GB。                   |            |
+|image         |可变长度的二进制字符串。最多 2GB。                   |            |
+|tinyint       |允许从 0 到 255 的所有数字。                       |   1 byte   |
+|smallint      |允许介于 -2^15 与 2^15-1 的所有数字。               |  2 bytes   |
+|int           |允许介于 -2^31 与 2^31-1 的所有数字。               |  4 bytes   |
+|bigint        |允许介于 -2^63 与 2^63-1 之间的所有数字。            |  8 bytes   |
+|decimal(p,s)  |固定精度和比例的数字。<br>允许从 -10^38 +1 到 10^38 -1 之间的数字。<br>p 参数指示可以存储的最大位数（小数点左侧和右侧）。<br>p 必须是 1 到 38 之间的值。默认是 18。<br>s 参数指示小数点右侧存储的最大位数。<br>s 必须是 0 到 p 之间的值。默认是 0。|5-17 bytes|
+|numeric(p,s)  |同上                                             | 5-17 bytes |
+|smallmoney    |介于 -2^31 与 2^31-1 之间的货币数据。               |   4 bytes  |
+|money         |介于 --2^63 与 -2^63-1 之间的货币数据。             |   8 bytes  |
+|float(n)      |从 -1.79E + 308 到 1.79E + 308 的浮动精度数字数据。<br>n 参数指示该字段保存 4 字节还是 8 字节。float(24) 保存 4 字节，而 float(53) 保存 8 字节。n 的默认值是 53。|4 或 8 bytes|
+|real          |从 -3.40E + 38 到 3.40E + 38 的浮动精度数字数据。   |   4 bytes  |
+|datetime      |从1753年1月1日到9999年12月31日，精度为 3.33 毫秒。   |   8 bytes  |
+|datetime2     |从1753年1月1日到9999年12月31日，精度为 100 纳秒。    | 6-8 bytes  |
+|smalldatetime |从1900年1月1日到2079年6月6日，精度为 1 分钟。	     |   4 bytes  |
+|date          |仅存储日期。从0001年1月1日 9999年12月31日。          |   3 bytes  |
+|time          |仅存储时间。精度为 100 纳秒。                       | 3-5 bytes  |
+|datetimeoffset|与 datetime2 相同，外加时区偏移。                   | 8-10 bytes |
+|timestamp     |存储唯一的数字，每当创建或修改某行时，该数字会更新。timestamp 值基于内部时钟，不对应真实时间。每个表只能有一个 timestamp 变量。||
+|sql_variant   |存储最多8,000字节不同数据类型的数据，除了text、ntext以及timestamp。||
+|uniqueidentifier|存储全局唯一标识符 (GUID)。                       |           |
+|xml           |存储 XML 格式化数据。最多 2GB。                     |           |
+|cursor        |存储对用于数据库操作的指针的引用。                    |           |
+|table         |存储结果集，供稍后处理。                             |           |
+
+4 或 8 字节
+
 ### MsSQL
 
 1. 创建数据库
@@ -534,6 +615,41 @@ select * from tablename where LIMIT 9,10
 ```
 
 [详细了解mssql索引](https://www.cnblogs.com/Brambling/p/6754993.html)
+
+7. 处理NULL值为0
+```sql
+SELECT ProductName,UnitPrice*(UnitsInStock+IFNULL(UnitsOnOrder,0)) FROM Products
+SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Products
+```
+
+8. 数据类型
+
+|    数据类型    |                             解析                             |
+|--------------|--------------------------------------------------------------|
+|CHAR(size)    |固定长度字符串（可包含字母、数字以及特殊字符）。size<255              |
+|VARCHAR(size) |长度字符串（可包含字母、数字以及特殊字符）。size<255,大于255时转为text |
+|TINYTEXT      |存放最大长度为 255 个字符的字符串。                                |
+|TEXT          |存放最大长度为 65,535 个字符的字符串。                             |
+|BLOB          |用于 BLOBs（Binary Large OBjects）。存放最多 65,535 字节的数据。   |
+|MEDIUMTEXT    |存放最大长度为 16,777,215 个字符的字符串。                         |
+|MEDIUMBLOB    |用于 BLOBs（Binary Large OBjects）。存放最多16,777,215 字节的数据。|
+|LONGTEXT      |存放最大长度为 4,294,967,295 个字符的字符串。                      |
+|LONGBLOB      |用于 BLOBs(Binary Large OBjects)。存放最多4,294,967,295字节的数据 |
+|ENUM(x,y,z,etc.)|允许输入可能值的列表。可以在 ENUM 列表中列出最大 65535 个值。如果列表中不存在插入的值，则插入空值。这些值是按照输入的顺序排序的。|
+|SET           |与 ENUM 类似，SET 最多只能包含64个列表项且SET可存储一个以上的选择。   |
+|TINYINT(size) |带符号-128到127 ，无符号0到255。                                 |
+|SMALLINT(size)|带符号范围-32768到32767，无符号0到65535, size 默认为 6。           |
+|MEDIUMINT(size)|带符号范围-2^23到2^23-1，无符号的范围是0到2^24-1。 size 默认为9    |
+|INT(size)     |带符号范围-2^31到2^31-1，无符号的范围是0到4294967295。siz 默认为11  |
+|BIGINT(size)  |带符号的范围是-2^63到2^63-1，无符号的范围是0到2^64-1。size 默认为 20 |
+|FLOAT(size,d) |带有浮动小数点的小数字。在 size 参数中规定显示最大位数。在 d 参数中规定小数点右侧的最大位数。|
+|DOUBLE(size,d)|带有浮动小数点的大数字。在 size 参数中规显示定最大位数。在 d 参数中规定小数点右侧的最大位数。|
+|DECIMAL(size,d)|作为字符串存储的 DOUBLE 类型，允许固定的小数点。在 size 参数中规定显示最大位数。在 d 参数中规定小数点右侧的最大位数。|
+|DATE()        |日期。格式：YYYY-MM-DD,从 '1000-01-01' 到 '9999-12-31'          |
+|DATETIME()    |日期和时间的组合。从'1000-01-01 00:00:00 到'9999-12-31 23:59:59' |
+|TIMESTAMP()   |时间戳。TIMESTAMP 值使用 Unix 纪元('1970-01-01 00:00:00' UTC) 至今的秒数来存储。格式：YYYY-MM-DD HH:MM:SS，从 '1970-01-01 00:00:01' UTC 到 '2038-01-09 03:14:07' UTC|
+|TIME()        |时间。格式：HH:MM:SS，从 '-838:59:59' 到 '838:59:59'            |
+|YEAR()	       |2 位或 4 位格式的年。4 位格式所允许的值：1901 到 2155。2 位格式所允许的值：70 到 69，表示从 1970 到 2069。|
 
 ## 非关系型数据库
 

@@ -37,6 +37,62 @@
                 City varchar(255)
             );
         ```
+
+        约束：
+        * NOT NULL - 指示某列不能存储 NULL 值。
+        * UNIQUE - 保证某列的每行必须有唯一的值。
+        * PRIMARY KEY - NOT NULL 和 UNIQUE 的结合。确保某列（或两个列多个列的结合）有唯一标识，有助于更容易更快速地找到表中的一个特定的记录。
+        * FOREIGN KEY - 保证一个表中的数据匹配另一个表中的值的参照完整性。
+        * CHECK - 保证列中的值符合指定的条件。
+        * DEFAULT - 规定没有给列赋值时的默认值。
+
+        删除约束：
+        ```sql
+            alter table x modify column_name null;
+            alter table x modify column_name not null;
+
+            ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (P_Id,LastName);
+            --撤销 UNIQUE:
+            --MySQL
+            ALTER TABLE Persons DROP INDEX uc_PersonID
+            --MsSQL
+            ALTER TABLE Persons DROP CONSTRAINT uc_PersonID
+
+            ALTER TABLE Persons ADD CONSTRAINT pk_PersonID PRIMARY KEY (P_Id,LastName);
+            --撤销 PRIMARY KEY:
+            --MySQL
+            ALTER TABLE Persons DROP PRIMARY KEY
+            --MsSQL
+            ALTER TABLE Persons DROP CONSTRAINT pk_PersonID
+
+            ALTER TABLE Orders ADD FOREIGN KEY (P_Id) REFERENCES Persons(P_Id);
+            --命名 FOREIGN KEY 约束，并定义多个列的 FOREIGN KEY 约束
+            ALTER TABLE Orders ADD CONSTRAINT fk_PerOrders FOREIGN KEY (P_Id) REFERENCES Persons(P_Id)
+            --撤销 FOREIGN KEY:
+            --MySQL
+            ALTER TABLE Orders DROP FOREIGN KEY fk_PerOrders
+            --MsSQL
+            ALTER TABLE Orders DROP CONSTRAINT fk_PerOrders
+
+            ALTER TABLE Persons ADD CONSTRAINT chk_Person CHECK (P_Id>0 AND City='Sandnes');
+            --撤销 CHECK:
+            --MySQL
+            ALTER TABLE Persons DROP CHECK chk_Person
+            --MsSQL
+            ALTER TABLE Persons DROP CONSTRAINT chk_Person
+
+            --添加default
+            --MySQL
+            ALTER TABLE Persons ALTER City SET DEFAULT 'SANDNES'
+            --MsSQL
+            ALTER TABLE Persons ADD CONSTRAINT ab_c DEFAULT 'SANDNES' for City
+            --撤销default
+            --MySQL
+            ALTER TABLE Persons ALTER City DROP DEFAULT
+            --MsSQL
+            ALTER TABLE Persons ALTER COLUMN City DROP DEFAULT
+        ```
+
     * ALTER TABLE - 变更（改变）数据库表
         ```sql
             ALTER TABLE table_name ADD column_name datatype;
@@ -159,13 +215,52 @@
 
     * union
 
+        UNION 内部的每个 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。每个 SELECT 语句中的列的顺序必须相同。UNION 默认选取不同的值。UNION ALL允许重复的值。
+
+        ```sql
+            SELECT column_name(s) FROM table1
+            UNION
+            SELECT column_name(s) FROM table2;
+
+            SELECT column_name(s) FROM table1
+            UNION ALL
+            SELECT column_name(s) FROM table2;
+        ```
+
     * select into
+
+        从一个表复制数据，然后把数据插入到另一个新表中
+
+        ```sql
+            SELECT column_name(s) INTO newtable FROM table1;
+        ```
+
+        mysql替代方法
+        ```sql
+            CREATE TABLE 新表
+            AS
+            SELECT * FROM 旧表 
+        ```
 
     * insert into select
 
-    * 约束
+        从一个表复制数据，插入到一个已存在的表中,目标表中任何已存在的行都不会受影响。
+
+        ```sql
+            INSERT INTO table1 (a, b) SELECT c, d FROM table2 WHERE id=1;
+        ```
 
     * drop
+
+        ```sql
+            drop 类型(表，列，索引) 名字
+        ```
+
+    * alert
+
+        ```sql
+            alert 类型(表，列，索引) 名字 操作(add,drop,modify) 类型(表，列，索引) 名字 [新值]
+        ```
 
     * 视图
 

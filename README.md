@@ -753,6 +753,13 @@ SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Produc
 
 ### MongoDB
 
+1. 安装与配置
+
+* [初探MongoDB —— 介绍、安装和配置](https://www.cnblogs.com/jianglan/p/4423189.html)
+* [MongoDB基本操作 —— 用Mongo.exe操作数据库增删改查](https://www.cnblogs.com/jianglan/p/4430299.html)
+
+2. 基础
+
 |SQL术语/概念|MongoDB术语/概念|解释/说明                       |
 |-----------|--------------|-------------------------------|
 |database   |database      |数据库                          |

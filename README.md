@@ -623,6 +623,13 @@ SELECT ProductName,UnitPrice*(UnitsInStock+ISNULL(UnitsOnOrder,0)) FROM Products
 
 4 或 8 字节
 
+9. 获取一段时间内的数据
+```sql
+--一个月内
+select createtime from user where DATE_SUB(CURDATE(), INTERVAL 1 MONTH) <= date(createtime);
+--一周INTERVAL 7 DAY
+```
+
 ### MsSQL
 
 1. 创建数据库
@@ -749,6 +756,13 @@ SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Produc
 |TIME()        |时间。格式：HH:MM:SS，从 '-838:59:59' 到 '838:59:59'            |
 |YEAR()	       |2 位或 4 位格式的年。4 位格式所允许的值：1901 到 2155。2 位格式所允许的值：70 到 69，表示从 1970 到 2069。|
 
+9. 获取一段时间内的数据
+```sql
+--10min内
+SELECT * FROM tablename WHERE 日期字段 > DATEADD(MINUTE,-10,GETDATE())
+SELECT * FROM tablename WHERE datediff(mi,时间字段,getdate())<=10
+```
+
 ## 非关系型数据库
 
 ### MongoDB
@@ -770,3 +784,279 @@ SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Produc
 |index      |index         |索引                            |
 |table joins|              |表连接,MongoDB不支持             |
 |primary key|primary key   |主键,MongoDB自动将_id字段设置为主键|
+
+|数据类型       |描述                                                         |
+|--------------|------------------------------------------------------------|
+|String	字符串。|存储数据常用的数据类型。在 MongoDB 中，UTF-8 编码的字符串才是合法的。|
+|Integer       |整型数值。用于存储数值。根据你所采用的服务器，可分为 32 位或 64 位。  |
+|Boolean       |布尔值。用于存储布尔值（真/假）。                                |
+|Double        |双精度浮点值。用于存储浮点值。                                   |
+|Min/Max keys  |将一个值与 BSON（二进制的 JSON）元素的最低值和最高值相对比。        |
+|Array         |用于将数组或列表或多个值存储为一个键。                            |
+|Timestamp     |时间戳。记录文档修改或添加的具体时间。                            |
+|Object        |用于内嵌文档。                                                |
+|Null          |用于创建空值。                                                |
+|Symbol        |符号。该数据类型基本上等同于字符串类型，但不同的是，它一般用于采用特殊符号类型的语言。|
+|Date          |日期时间。用 UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 |Date 对象，传入年月日信息。|
+|Object ID     |对象 ID。用于创建文档的 ID。                                    |
+|Binary Data   |二进制数据。用于存储二进制数据。                                  |
+|Code          |代码类型。用于在文档中存储 JavaScript 代码。                      |
+|Regular expression|正则表达式类型。用于存储正则表达式。                          |
+
+
+* ObjectId
+
+ObjectId 类似唯一主键，可以很快的去生成和排序，包含 12 bytes：
+1. 1-4表示创建 unix 时间戳,格林尼治时间 UTC 时间，比北京时间晚了 8 个小时
+2. 5-7是机器标识码
+3. 8-9由进程 id 组成 PID
+4. 10-12是随机数
+
+MongoDB 中存储的文档必须有一个 _id 键。这个键的值可以是任何类型，默认是 ObjectId 对象。
+
+由于 ObjectId 中保存了创建的时间戳，所以不需要为文档保存时间戳字段，可通过 getTimestamp 函数来获取文档的创建时间:
+```sql
+var newObject = ObjectId()
+newObject.getTimestamp()
+--ISODate("2017-11-25T07:21:10Z")
+newObject.str
+--5a1919e63df83ce79df8b38f
+```
+
+* 字符串
+
+BSON 字符串都是 UTF-8 编码。
+
+* 时间戳
+
+BSON 有一个特殊的时间戳类型用于 MongoDB 内部使用，与普通的 日期 类型不相关。 时间戳值是一个 64 位的值：
+1. 前32位是一个 time_t 值（与Unix新纪元相差的秒数）
+2. 后32位是在某秒中操作的一个递增的序数
+3. 在单个 mongod 实例中，时间戳值通常是唯一的。
+
+在复制集中， oplog 有一个 ts 字段。这个字段中的值使用BSON时间戳表示了操作时间。
+
+* 日期
+
+表示当前距离 Unix新纪元（1970年1月1日）的毫秒数。日期类型是有符号的, 负数表示 1970 年之前的日期。
+
+```sql
+var mydate1 = new Date()     --格林尼治时间
+mydate1
+--ISODate("2018-03-04T14:58:51.233Z")
+typeof mydate1
+--object
+var mydate2 = ISODate() //格林尼治时间
+mydate2
+--ISODate("2018-03-04T15:00:45.479Z")
+typeof mydate2
+--object
+--这样创建的时间是日期类型，可以使用 JS 中的 Date 类型的方法。
+
+--返回一个时间类型的字符串：
+
+var mydate1str = mydate1.toString()
+mydate1str
+--Sun Mar 04 2018 14:58:51 GMT+0000 (UTC) 
+typeof mydate1str
+--string
+--或者
+Date()
+--Sun Mar 04 2018 15:02:59 GMT+0000 (UTC)   
+```
+
+3. 连接
+
+标准 URI 连接:
+
+mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
+* mongodb:// 这是固定的格式，必须要指定。
+* username:password@ 可选项，如果设置，在连接数据库服务器之后，驱动都会尝试登陆这个数据库
+* host1 必须的指定至少一个host, host1 是这个URI唯一要填写的。它指定了要连接服务器的地址。如果要连接复制集，请指定多个主机地址。
+* portX 可选的指定端口，如果不填，默认为27017
+* /database 如果指定username:password@，连接并验证登陆指定数据库。若不指定，默认打开 test 数据库。
+* ?options 是连接选项。如果不使用/database，则前面需要加上/。所有连接选项都是键值对name=value，键值对之间通过&或;（分号）隔开
+
+样例：
+
+* 连接本地数据库服务器，端口是默认的。
+
+mongodb://localhost
+
+* 使用用户名fred，密码foobar登录localhost的admin数据库。
+
+mongodb://fred:foobar@localhost
+
+* 使用用户名fred，密码foobar登录localhost的baz数据库。
+
+mongodb://fred:foobar@localhost/baz
+
+* 连接 replica pair, 服务器1为example1.com服务器2为example2。
+
+mongodb://example1.com:27017,example2.com:27017
+
+* 连接 replica set 三台服务器 (端口 27017, 27018, 和27019):
+
+mongodb://localhost,localhost:27018,localhost:27019
+
+* 连接 replica set 三台服务器, 写入操作应用在主服务器 并且分布查询到从服务器。
+
+mongodb://host1,host2,host3/?slaveOk=true
+
+* 直接连接第一个服务器，无论是replica set一部分或者主服务器或者从服务器。
+
+mongodb://host1,host2,host3/?connect=direct;slaveOk=true
+
+当你的连接服务器有优先级，还需要列出所有服务器，你可以使用上述连接方式。
+
+* 安全模式连接到localhost:
+
+mongodb://localhost/?safe=true
+
+* 以安全模式连接到replica set，并且等待至少两个复制服务器成功写入，超时时间设置为2秒。
+
+mongodb://host1,host2,host3/?safe=true;w=2;wtimeoutMS=2000
+
+4. 语法
+
+* 创建数据库
+```sql
+use DATABASE_NAME --创建数据库
+show dbs --查看所有数据库
+```
+
+* 删除数据库
+```sql
+db.dropDatabase() --删除数据库
+```
+
+* 创建数据表(直接插入数据也能创建)
+```sql
+db.createCollection(name, options)
+```
+
+|字段        |类型|描述|
+|-----------|----|---|
+|capped     |布尔|（可选）如果为 true，则创建固定集合。<br>固定集合是指有着固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。<br>当该值为 true 时，必须指定 size 参数。|
+|autoIndexId|布尔|（可选）如为 true，自动在 _id 字段创建索引。默认为 false。|
+|size       |数值|（可选）为固定集合指定一个最大值（以字节计）。<br>如果 capped 为 true，也需要指定该字段。|
+|max        |数值|（可选）指定固定集合中包含文档的最大数量。<br>在插入文档时，MongoDB 首先检查固定集合的 size 字段，然后检查 max 字段。|
+
+* 删除数据表
+```sql
+show collections --查看数据表
+db.tablename.drop()  --删除数据表
+```
+
+* 插入数据
+```sql
+db.COLLECTION_NAME.insert(json) --插入数据
+db.collection.insertOne({"a": 3}) --插入单条数据
+db.collection.insertMany([{"b": 3}, {'c': 4}]) --插入多条数据
+```
+
+* 更新数据
+```sql
+db.collection.update(
+   <query>,
+   <update>,
+   {
+     upsert: <boolean>,
+     multi: <boolean>,
+     writeConcern: <document>
+   }
+)
+db.col.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}}) --更新标题
+db.col.save({
+    "_id" : ObjectId("56064f89ade2f21f36b03136"),
+    "title" : "MongoDB",
+    "description" : "MongoDB 是一个 Nosql 数据库",
+    "by" : "Runoob",
+    "url" : "http://www.runoob.com",
+    "tags" : [
+            "mongodb",
+            "NoSQL"
+    ],
+    "likes" : 110
+}) --替换数据
+db.col.update({"_id":"56064f89ade2f21f36b03136"}, {$unset:{ "test2" : "OK"}}) --移除键值对
+```
+* query : update的查询条件，类似sql update查询内where后面的。
+* update : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+* upsert : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+* multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+* writeConcern :可选，抛出异常的级别。
+
+* 删除数据
+```sql
+db.collection.remove(
+   <query>,
+   {
+     justOne: <boolean>,
+     writeConcern: <document>
+   }
+)
+db.col.remove({'title':'MongoDB 教程'}) --删除指定title的所有数据
+db.col.remove({}) --删除所有数据
+db.inventory.deleteMany({}) --删除集合下全部文档
+db.inventory.deleteMany({ status : "A" }) --删除 status 等于 A 的全部文档
+db.inventory.deleteOne( { status: "D" } ) --删除 status 等于 D 的一个文档
+```
+
+* query :（可选）删除的文档的条件。
+* justOne : （可选）如果设为 true 或 1，则只删除一个文档。
+* writeConcern :（可选）抛出异常的级别。
+
+* 查询数据
+```sql
+db.collection.find(query, projection)
+db.col.find().pretty() --以易读的方式来读取数据
+db.col.find({key1:value1, key2:value2}).pretty() --and
+db.col.find(
+   {
+      $or: [
+         {key1: value1}, {key2:value2}
+      ]
+   }
+).pretty() --or
+db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty() --混合
+--若不指定 projection，则默认返回所有键，指定 projection 格式如下，有两种模式
+db.collection.find(query, {title: 1, by: 1}) --inclusion模式 指定返回的键，不返回其他键
+db.collection.find(query, {title: 0, by: 0}) --exclusion模式 指定不返回的键,返回其他键
+--_id 键默认返回，需要主动指定 _id:0 才会隐藏
+--两种模式不可混用（因为这样的话无法推断其他键是否应返回）
+db.collection.find(query, {title: 1, by: 0}) --错误
+--只能全1或全0，除了在inclusion模式时可以指定_id为0
+db.collection.find(query, {_id:0, title: 1, by: 1}) --正确
+--若不想指定查询条件参数 query 可以 用 {} 代替，但是需要指定 projection 参数：
+querydb.collection.find({}, {title: 1})
+```
+
+* query ：可选，使用查询操作符指定查询条件
+* projection ：可选，使用投影操作符指定返回的键。查询时返回文档中所有键值， 只需省略该参数即可（默认省略）。
+
+
+* db.col.find({"by":"菜鸟教程"}).pretty()
+
+where by = '菜鸟教程'
+
+* db.col.find({"likes":{$lt:50}}).pretty()
+
+where likes < 50
+
+* db.col.find({"likes":{$lte:50}}).pretty()
+
+where likes <= 50
+
+* db.col.find({"likes":{$gt:50}}).pretty()
+
+where likes > 50
+
+* db.col.find({"likes":{$gte:50}}).pretty()
+
+where likes >= 50
+
+* db.col.find({"likes":{$ne:50}}).pretty()
+
+where likes != 50
+

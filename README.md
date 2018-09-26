@@ -1227,6 +1227,238 @@ db.getCollection('m_msg_tb').aggregate(
  * $millisecond：返回该日期的毫秒部分（0 到 999）。
  * $dateToString： { $dateToString: { format: , date: } }。
 
+5. 技术与原理
+
+* 复制（副本集）
+
+用途：
+* 保障数据的安全性
+* 数据高可用性 (24*7)
+* 灾难恢复
+* 无需停机维护（如备份，重建索引，压缩）
+* 分布式读取数据
+
+启动服务器：
+
+mongod --port "PORT" --dbpath "YOUR_DB_DATA_PATH" --replSet "REPLICA_SET_INSTANCE_NAME"
+
+样例：
+
+mongod --port 27017 --dbpath "D:\set up\mongodb\data" --replSet rs0
+
+以上实例会启动一个名为rs0的MongoDB实例，其端口号为27017。
+
+启动后打开命令提示框并连接上mongoDB服务。
+
+在Mongo客户端使用命令rs.initiate()来启动一个新的副本集。
+
+我们可以使用rs.conf()来查看副本集的配置
+
+查看副本集状态使用 rs.status() 命令
+
+添加副本集的成员，我们需要使用多台服务器来启动mongo服务。进入Mongo客户端，并使用rs.add()方法来添加副本集的成员。
+
+rs.add("mongod1.net:27017")
+
+MongoDB中你只能通过主节点将Mongo服务添加到副本集中， 判断当前运行的Mongo服务是否为主节点可以使用命令db.isMaster() 。
+
+MongoDB的副本集与我们常见的主从有所不同，主从在主机宕机后所有服务将停止，而副本集在主机宕机后，副本会接管主节点成为主节点，不会出现宕机的情况。
+
+* 分片
+
+当MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。
+```text
+分片结构端口分布如下：
+
+Shard Server 1：27020
+Shard Server 2：27021
+Shard Server 3：27022
+Shard Server 4：27023
+Config Server ：27100
+Route Process：40000
+步骤一：启动Shard Server
+
+[root@100 /]# mkdir -p /www/mongoDB/shard/s0
+[root@100 /]# mkdir -p /www/mongoDB/shard/s1
+[root@100 /]# mkdir -p /www/mongoDB/shard/s2
+[root@100 /]# mkdir -p /www/mongoDB/shard/s3
+[root@100 /]# mkdir -p /www/mongoDB/shard/log
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27020 --dbpath=/www/mongoDB/shard/s0 --logpath=/www/mongoDB/shard/log/s0.log --logappend --fork
+....
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27023 --dbpath=/www/mongoDB/shard/s3 --logpath=/www/mongoDB/shard/log/s3.log --logappend --fork
+步骤二： 启动Config Server
+
+[root@100 /]# mkdir -p /www/mongoDB/shard/config
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27100 --dbpath=/www/mongoDB/shard/config --logpath=/www/mongoDB/shard/log/config.log --logappend --fork
+注意：这里我们完全可以像启动普通mongodb服务一样启动，不需要添加—shardsvr和configsvr参数。因为这两个参数的作用就是改变启动端口的，所以我们自行指定了端口就可以。
+
+步骤三： 启动Route Process
+
+/usr/local/mongoDB/bin/mongos --port 40000 --configdb localhost:27100 --fork --logpath=/www/mongoDB/shard/log/route.log --chunkSize 500
+mongos启动参数中，chunkSize这一项是用来指定chunk的大小的，单位是MB，默认大小为200MB.
+
+步骤四： 配置Sharding
+
+接下来，我们使用MongoDB Shell登录到mongos，添加Shard节点
+
+[root@100 shard]# /usr/local/mongoDB/bin/mongo admin --port 40000
+MongoDB shell version: 2.0.7
+connecting to: 127.0.0.1:40000/admin
+mongos> db.runCommand({ addshard:"localhost:27020" })
+{ "shardAdded" : "shard0000", "ok" : 1 }
+......
+mongos> db.runCommand({ addshard:"localhost:27029" })
+{ "shardAdded" : "shard0009", "ok" : 1 }
+mongos> db.runCommand({ enablesharding:"test" }) #设置分片存储的数据库
+{ "ok" : 1 }
+mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
+{ "collectionsharded" : "test.log", "ok" : 1 }
+步骤五： 程序代码内无需太大更改，直接按照连接普通的mongo数据库那样，将数据库连接接入接口40000
+
+---
+
+1. 创建Sharding复制集 rs0
+
+# mkdir /data/log
+# mkdir /data/db1
+# nohup mongod --port 27020 --dbpath=/data/db1 --logpath=/data/log/rs0-1.log --logappend --fork --shardsvr --replSet=rs0 &
+
+# mkdir /data/db2
+# nohup mongod --port 27021 --dbpath=/data/db2 --logpath=/data/log/rs0-2.log --logappend --fork --shardsvr --replSet=rs0 &
+1.1 复制集rs0配置
+
+# mongo localhost:27020 > rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27020'}, {_id: 1, host: 'localhost:27021'}]}) > rs.isMaster() #查看主从关系
+2. 创建Sharding复制集 rs1
+
+# mkdir /data/db3
+# nohup mongod --port 27030 --dbpath=/data/db3 --logpath=/data/log/rs1-1.log --logappend --fork --shardsvr --replSet=rs1 &
+# mkdir /data/db4
+# nohup mongod --port 27031 --dbpath=/data/db4 --logpath=/data/log/rs1-2.log --logappend --fork --shardsvr --replSet=rs1 &
+2.1 复制集rs1配置
+
+# mongo localhost:27030
+> rs.initiate({_id: 'rs1', members: [{_id: 0, host: 'localhost:27030'}, {_id: 1, host: 'localhost:27031'}]})
+> rs.isMaster() #查看主从关系
+3. 创建Config复制集 conf
+
+# mkdir /data/conf1
+# nohup mongod --port 27100 --dbpath=/data/conf1 --logpath=/data/log/conf-1.log --logappend --fork --configsvr --replSet=conf &
+# mkdir /data/conf2
+# nohup mongod --port 27101 --dbpath=/data/conf2 --logpath=/data/log/conf-2.log --logappend --fork --configsvr --replSet=conf &
+3.1 复制集conf配置
+
+# mongo localhost:27100
+> rs.initiate({_id: 'conf', members: [{_id: 0, host: 'localhost:27100'}, {_id: 1, host: 'localhost:27101'}]})
+> rs.isMaster() #查看主从关系
+4. 创建Route
+
+# nohup mongos --port 40000 --configdb conf/localhost:27100,localhost:27101 --fork --logpath=/data/log/route.log --logappend & 
+4.1 设置分片
+
+# mongo localhost:40000
+> use admin
+> db.runCommand({ addshard: 'rs0/localhost:27020,localhost:27021'})
+> db.runCommand({ addshard: 'rs1/localhost:27030,localhost:27031'})
+> db.runCommand({ enablesharding: 'test'})
+> db.runCommand({ shardcollection: 'test.user', key: {name: 1}})
+```
+
+* 备份(mongodump)与恢复(mongorestore)
+
+1. 备份:
+
+mongodump -h dbhost -d dbname -o dbdirectory
+
+* -h：
+MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017
+
+* -d：
+需要备份的数据库实例，例如：test
+
+* -o：
+备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个test目录，这个目录里面存放该数据库实例的备份数据。
+
+mongodump 命令可选参数列表如下所示：
+
+|语法	                                       |描述	                     |实例|
+|---------------------------------------------|-----------------------------|----|
+|mongodump --host HOST_NAME --port PORT_NUMBER    |该命令将备份所有MongoDB数据 |mongodump --host runoob.com --port 27017|
+|mongodump --dbpath DB_PATH --out BACKUP_DIRECTORY|                         |mongodump --dbpath /data/db/ --out /data/backup/|
+|mongodump --collection COLLECTION --db DB_NAME   |该命令将备份指定数据库的集合。|mongodump --collection mycol --db test|
+
+2. 恢复
+
+mongorestore -h \<hostname\><:port> -d dbname \<path\>
+
+* --host <:port>, -h <:port>：
+MongoDB所在服务器地址，默认为： localhost:27017
+
+* --db , -d ：
+需要恢复的数据库实例，例如：test，当然这个名称也可以和备份时候的不一样，比如test2
+
+* --drop：
+恢复的时候，先删除当前数据，然后恢复备份的数据。就是说，恢复后，备份后添加修改的数据都会被删除，慎用哦！
+
+* \<path\>：
+mongorestore 最后的一个参数，设置备份数据所在位置，例如：c:\data\dump\test。
+
+你不能同时指定 \<path\> 和 --dir 选项，--dir也可以设置备份目录。
+
+* --dir：
+指定备份的目录
+
+你不能同时指定 \<path\> 和 --dir 选项。
+
+---
+
+* 监控
+
+mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。
+
+D:\set up\mongodb\bin>mongostat
+
+mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看哪些大量的时间花费在读取和写入数据。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。
+
+D:\set up\mongodb\bin>mongotop
+
+E:\mongodb-win32-x86_64-2.2.1\bin>mongotop 10
+
+后面的10是<sleeptime>参数 ，可以不使用，等待的时间长度，以秒为单位，mongotop等待调用之间。通过的默认mongotop返回数据的每一秒。
+
+ E:\mongodb-win32-x86_64-2.2.1\bin>mongotop --locks
+
+输出结果字段说明：
+
+* ns：
+包含数据库命名空间，后者结合了数据库名称和集合。
+
+* db：
+包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。
+
+* total：
+mongod花费的时间工作在这个命名空间提供总额。
+
+* read：
+提供了大量的时间，这mongod花费在执行读操作，在此命名空间。
+
+* write：
+提供这个命名空间进行写操作，这mongod花了大量的时间。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

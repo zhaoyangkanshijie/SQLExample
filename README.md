@@ -1125,6 +1125,7 @@ db.COLLECTION_NAME.find().sort({KEY:1})
 skip(), limilt(), sort()三个放在一起执行的时候，执行的顺序是先 sort(), 然后是 skip()，最后是显示的 limit()
 
 * 索引
+1. 创建索引
 ```sql
 db.collection.createIndex(keys, options)
 --1按升序创建索引，-1按降序创建索引
@@ -1144,6 +1145,20 @@ db.values.createIndex({open: 1, close: 1}, {background: true})
 |weights           |document     |索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。|
 |default_language  |string       |对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语|
 |language_override |string       |对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.|
+
+2. 覆盖索引查询(不从数据库找数据)
+```sql
+--创建索引（旧版本写法）
+db.users.ensureIndex({gender:1,user_name:1})
+--查询，它会从索引中提取数据，这是非常快速的数据查询
+--由于我们的索引中不包括 _id 字段，_id在查询中会默认返回，我们可以在MongoDB的查询结果集中排除它。
+db.users.find({gender:"M"},{user_name:1,_id:0})
+--查询就不会被覆盖，从数据库查数据
+db.users.find({gender:"M"},{user_name:1})
+```
+以下的查询，不能使用覆盖索引查询：
+1. 所有索引字段是一个数组
+2. 所有索引字段是一个子文档
 
 * aggregate聚合
 
@@ -1444,10 +1459,83 @@ mongod花费的时间工作在这个命名空间提供总额。
 * write：
 提供这个命名空间进行写操作，这mongod花了大量的时间。
 
+6. 高级应用
 
+* 关系
 
+1. 嵌入式关系
 
+保存在单一的文档中，可以比较容易的获取和维护数据
+```text
+{
+   "_id":ObjectId("52ffc33cd85242f436000001"),
+   "contact": "987654321",
+   "dob": "01-01-1991",
+   "name": "Tom Benzamin",
+   "address": [
+      {
+         "building": "22 A, Indiana Apt",
+         "pincode": 123456,
+         "city": "Los Angeles",
+         "state": "California"
+      },
+      {
+         "building": "170 A, Acropolis Apt",
+         "pincode": 456789,
+         "city": "Chicago",
+         "state": "Illinois"
+      }]
+} 
+```
+查询方法
+```sql
+db.users.findOne({"name":"Tom Benzamin"},{"address":1})
+```
 
+2. 引用式关系
+
+把用户数据文档和用户地址数据文档分开，通过引用文档的 id 字段来建立关系。
+```text
+{
+   "_id":ObjectId("52ffc33cd85242f436000001"),
+   "contact": "987654321",
+   "dob": "01-01-1991",
+   "name": "Tom Benzamin",
+   "address_ids": [
+      ObjectId("52ffc4a5d85242602e000000"),
+      ObjectId("52ffc4a5d85242602e000001")
+   ]
+}
+```
+查询方法
+```sql
+var result = db.users.findOne({"name":"Tom Benzamin"},{"address_ids":1})
+var addresses = db.address.find({"_id":{"$in":result["address_ids"]}})
+```
+
+引用方式：
+1. DBRefs
+* $ref：集合名称
+* $id：引用的id
+* $db:数据库名称，可选参数
+```text
+{
+   "_id":ObjectId("53402597d852426020000002"),
+   "address": {
+   "$ref": "address_home",
+   "$id": ObjectId("534009e4d852427820000002"),
+   "$db": "runoob"},
+   "contact": "987654321",
+   "dob": "01-01-1991",
+   "name": "Tom Benzamin"
+}
+```
+查询方法
+```sql
+var user = db.users.findOne({"name":"Tom Benzamin"})
+var dbRef = user.address
+db[dbRef.$ref].findOne({"_id":(dbRef.$id)})
+```
 
 
 

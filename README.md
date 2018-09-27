@@ -1159,7 +1159,52 @@ db.users.find({gender:"M"},{user_name:1})
 以下的查询，不能使用覆盖索引查询：
 1. 所有索引字段是一个数组
 2. 所有索引字段是一个子文档
+---
+3. 索引子文档字段
 
+```sql
+{
+   "address": {
+      "city": "Los Angeles",
+      "state": "California",
+      "pincode": "123"
+   },
+   "tags": [
+      "music",
+      "cricket",
+      "blogs"
+   ],
+   "name": "Tom Benzamin"
+}
+--在我们为数组 tags 创建索引时，会为 music、cricket、blogs三个值建立单独的索引。
+db.users.ensureIndex({"tags":1})
+db.users.find({tags:"cricket"})
+--索引子文档字段
+db.users.ensureIndex({"address.city":1,"address.state":1,"address.pincode":1})
+db.users.find({"address.city":"Los Angeles"})   
+db.users.find({"address.state":"California","address.city":"Los Angeles"}) 
+db.users.find({"address.city":"Los Angeles","address.state":"California","address.pincode":"123"})
+```
+
+4. 索引限制
+* 查询限制
+
+索引不能被以下的查询使用：
+1. 正则表达式及非操作符，如 $nin, $not, 等。
+2. 算术运算符，如 $mod, 等。
+3. $where 子句
+
+* 索引键限制
+从2.6版本开始，如果现有的索引字段的值超过索引键的限制，MongoDB中不会创建索引。
+
+* 插入文档超过索引键限制
+如果文档的索引字段值超过了索引键的限制，MongoDB不会将任何文档转换成索引的集合。
+
+* 最大范围
+1. 集合中索引不能超过64个
+2. 索引名的长度不能超过128个字符
+3. 一个复合索引最多可以有31个字段
+---
 * aggregate聚合
 
 用于处理数据(如统计平均值,求和，聚类等)，并返回计算后的数据结果。类似sql语句中的 count和group by。
@@ -1514,7 +1559,8 @@ var addresses = db.address.find({"_id":{"$in":result["address_ids"]}})
 ```
 
 引用方式：
-1. DBRefs
+
+DBRefs
 * $ref：集合名称
 * $id：引用的id
 * $db:数据库名称，可选参数
@@ -1537,9 +1583,301 @@ var dbRef = user.address
 db[dbRef.$ref].findOne({"_id":(dbRef.$id)})
 ```
 
+* 查询分析
+```sql
+db.users.find({gender:"M"},{user_name:1,_id:0}).explain()
+db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1})
+db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1}).explain()
+```
+* indexOnly: 字段为 true ，表示我们使用了索引。
+* cursor：因为这个查询使用了索引，MongoDB 中索引存储在B树结构中，所以这是也使用了 BtreeCursor 类型的游标。如果没有使用索引，游标的类型是 BasicCursor。这个键还会给出你所使用的索引的名称，你通过这个名称可以查看当前数据库下的system.indexes集合（系统自动创建，由于存储索引信息，这个稍微会提到）来得到索引的详细信息。
+* n：当前查询返回的文档数量。
+* nscanned/nscannedObjects：表明当前这次查询一共扫描了集合中多少个文档，我们的目的是，让这个数值和返回文档的数量越接近越好。
+* millis：当前查询所需时间，毫秒数。
+* indexBounds：当前查询具体使用的索引。
+---
+* 原子操作
+```sql
+--判断是否可结算并更新新的结算信息
+db.books.findAndModify ( {
+   query: {
+            _id: 123456789,
+            available: { $gt: 0 }
+          },
+   update: {
+             $inc: { available: -1 },
+             $push: { checkout: { by: "abc", date: new Date() } }
+           }
+} )
+```
 
+* $set
+```sql
+用来指定一个键并更新键值，若键不存在并创建。
+{ $set : { field : value } }
+```
+* $unset
+```sql
+用来删除一个键。
+{ $unset : { field : 1} }
+```
+* $inc
+```sql
+$inc可以对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。
+{ $inc : { field : value } }
+```
+* $push
+```sql
+--把value追加到field里面去，field一定要是数组类型才行，如果field不存在，会新增一个数组类型加进去。
+{ $push : { field : value } }
+```
+* $pushAll
+```sql
+--同$push,只是一次可以追加多个值到一个数组字段内。
+{ $pushAll : { field : value_array } }
+```
+* $pull
+```sql
+--从数组field内删除一个等于value值。
+{ $pull : { field : _value } }
+```
+* $addToSet
+```
+增加一个值到数组内，而且只有当这个值不在数组内才增加。
+```
+* $pop
+```sql
+--删除数组的第一个或最后一个元素
+{ $pop : { field : 1 } }
+```
+* $rename
+```sql
+--修改字段名称
+{ $rename : { old_field_name : new_field_name } }
+```
+* $bit
+```sql
+--位操作，integer类型
+{$bit : { field : {and : 5}}}
+```
+* 偏移操作符
+```sql
+t.find() { "_id" : ObjectId("4b97e62bf1d8c7152c9ccb74"), "title" : "ABC", "comments" : [ { "by" : "joe", "votes" : 3 }, { "by" : "jane", "votes" : 7 } ] }
+ 
+t.update( {'comments.by':'joe'}, {$inc:{'comments.$.votes':1}}, false, true )
+ 
+t.find() { "_id" : ObjectId("4b97e62bf1d8c7152c9ccb74"), "title" : "ABC", "comments" : [ { "by" : "joe", "votes" : 4 }, { "by" : "jane", "votes" : 7 } ] }
+```
+---
+* Map Reduce 大型聚合查询
 
+Map-Reduce是一种计算模型，将大批量的工作（数据）分解（MAP）执行，然后再将结果合并成最终结果（REDUCE）。
 
+```sql
+db.collection.mapReduce(
+   function() {emit(key,value);},  //map 函数
+   function(key,values) {return reduceFunction},   //reduce 函数
+   {
+      out: collection,
+      query: document,
+      sort: document,
+      limit: number
+   }
+)
+```
+参数说明:
+
+* map ：映射函数 (生成键值对序列,作为 reduce 函数参数)。
+* reduce 统计函数，reduce函数的任务就是将key-values变成key-value，也就是把values数组变成一个单一的值value。
+* out 统计结果存放集合 (不指定则使用临时集合,在客户端断开后自动删除)。
+* query 一个筛选条件，只有满足条件的文档才会调用map函数。（query。limit，sort可以随意组合）
+* sort 和limit结合的sort排序参数（也是在发往map函数前给文档排序），可以优化分组机制
+* limit 发往map函数的文档数量的上限（要是没有limit，单独使用sort的用处不大）
+
+![Map Reduce](map-reduce.bakedsvg.svg)
+
+---
+* 全文检索
+
+1. 启用
+
+MongoDB 在 2.6 版本以后是默认开启全文检索的，如果使用之前的版本，需要使用启用全文检索:
+```
+db.adminCommand({setParameter:true,textSearchEnabled:true})
+或
+mongod --setParameter textSearchEnabled=true
+```
+
+2. 创建
+```
+{
+   "post_text": "enjoy the mongodb articles on Runoob",
+   "tags": [
+      "mongodb",
+      "runoob"
+   ]
+}
+```
+```sql
+db.posts.ensureIndex({post_text:"text"})
+```
+
+3. 使用
+```sql
+db.posts.find({$text:{$search:"runoob"}})
+或
+db.posts.runCommand("text",{search:"runoob"})
+```
+
+4. 删除
+```sql
+db.posts.getIndexes() --查找索引名
+db.posts.dropIndex("post_text_text") 
+```
+
+* 正则表达式
+```
+{
+   "post_text": "enjoy the mongodb articles on Runoob",
+   "tags": [
+      "mongodb",
+      "runoob"
+   ]
+}
+```
+```sql
+db.posts.find({post_text:{$regex:"runoob"}})
+db.posts.find({post_text:/runoob/})
+db.posts.find({post_text:{$regex:"runoob",$options:"$i"}}) -- 相当于/runoob/i忽略大小写
+db.posts.find({tags:{$regex:"run"}})
+```
+$regex操作符的使用:
+
+$regex操作符中的option选项可以改变正则匹配的默认行为，它包括i, m, x以及S四个选项，其含义如下
+
+* i 忽略大小写，{<field>{$regex/pattern/i}}，设置i选项后，模式中的字母会进行大小写不敏感匹配。
+* m 多行匹配模式，{<field>{$regex/pattern/,$options:'m'}，m选项会更改^和$元字符的默认行为，分别使用与行的开头和结尾匹配，而不是与输入字符串的开头和结尾匹配。
+* x 忽略非转义的空白字符，{<field>:{$regex:/pattern/,$options:'m'}，设置x选项后，正则表达式中的非转义的空白字符将被忽略，同时井号(#)被解释为注释的开头注，只能显式位于option选项中。
+* s 单行匹配模式{<field>:{$regex:/pattern/,$options:'s'}，设置s选项后，会改变模式中的点号(.)元字符的默认行为，它会匹配所有字符，包括换行符(\n)，只能显式位于option选项中。
+使用$regex操作符时，需要注意下面几个问题:
+
+* i，m，x，s可以组合使用，例如:{name:{$regex:/j*k/,$options:"si"}}
+在设置索弓}的字段上进行正则匹配可以提高查询速度，而且当正则表达式使用的是前缀表达式时，查询速度会进一步提高，例如:{name:{$regex: /^joe/}
+
+---
+* GridFS
+
+GridFS 用于存储和恢复那些超过16M（BSON文件限制）的文件(如：图片、音频、视频等)。
+
+GridFS 也是文件存储的一种方式，但是它是存储在MonoDB的集合中。
+
+GridFS 可以更好的存储大于16M的文件。
+
+GridFS 会将大文件对象分割成多个小的chunk(文件片段),一般为256k/个,每个chunk将作为MongoDB的一个文档(document)被存储在chunks集合中。
+
+GridFS 用两个集合来存储一个文件：fs.files与fs.chunks。
+
+每个文件的实际内容被存在chunks(二进制数据)中,和文件有关的meta数据(filename,content_type,还有用户自定义的属性)将会被存在files集合中。
+
+fs.files:
+```
+{
+   "filename": "test.txt",
+   "chunkSize": NumberInt(261120),
+   "uploadDate": ISODate("2014-04-13T11:32:33.557Z"),
+   "md5": "7b762939321e146569b07f72c62cca4f",
+   "length": NumberInt(646)
+}
+```
+fs.chunks:
+```
+{
+   "files_id": ObjectId("534a75d19f54bfec8a2fe44b"),
+   "n": NumberInt(0),
+   "data": "Mongo Binary Data"
+}
+```
+
+添加文件:
+
+put 命令来存储 mp3 文件
+
+```
+mongofiles.exe -d gridfs put song.mp3
+```
+
+查看文档:
+```sql
+db.fs.files.find()
+```
+
+获取chunk数据
+```
+db.fs.chunks.find({files_id:ObjectId('534a811bf8b4aa4d33fdf94d')})
+```
+
+* 固定集合（Capped Collections）
+
+固定集合是性能出色且有着固定大小的集合，就像一个环形队列，当集合空间用完后，再插入的元素就会覆盖最初始的头部的元素
+
+属性
+1. 对固定集合进行插入速度极快
+2. 按照插入顺序的查询输出速度极快
+3. 能够在插入最新数据时,淘汰最早的数据
+
+用法
+1. 储存日志信息
+2. 缓存一些少量的文档
+
+创建:
+```sql
+--指定文档个数1000,可不指定,大小10000kb
+db.createCollection("cappedLogCollection",{capped:true,size:10000,max:1000})
+```
+
+判断集合是否为固定集合:
+```sql
+db.cappedLogCollection.isCapped()
+```
+
+将已存在的集合转换为固定集合:
+```sql
+db.runCommand({"convertToCapped":"posts",size:10000})
+```
+
+查询:
+
+默认情况下查询就是按照插入顺序返回的,也可以使用$natural调整返回顺序
+```sql
+db.cappedLogCollection.find().sort({$natural:-1})
+```
+
+* _id 自动增长
+
+使用 counters 集合
+```sql
+db.createCollection("counters")
+db.counters.insert({_id:"productid",sequence_value:0})
+function getNextSequenceValue(sequenceName){
+   var sequenceDocument = db.counters.findAndModify(
+      {
+         query:{_id: sequenceName },
+         update: {$inc:{sequence_value:1}},
+         "new":true
+      });
+   return sequenceDocument.sequence_value;
+}
+db.products.insert({
+   "_id":getNextSequenceValue("productid"),
+   "product_name":"Apple iPhone",
+   "category":"mobiles"})
+
+db.products.insert({
+   "_id":getNextSequenceValue("productid"),
+   "product_name":"Samsung S3",
+   "category":"mobiles"})
+db.products.find()
+```
 
 
 

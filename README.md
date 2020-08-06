@@ -6,7 +6,7 @@
     * [MsSQL](#MsSQL)
 * [非关系型数据库](#非关系型数据库)
     * [MongoDB](#MongoDB)
-
+    * [redis](#redis)
 ---
 
 ## 基本语法
@@ -1888,15 +1888,215 @@ db.products.insert({
 db.products.find()
 ```
 
+### redis
+
+1. 概述
+
+    redis 是完全开源免费的，遵守BSD协议，是一个高性能的key-value数据库。
+
+    Redis 与其他 key - value 缓存产品有以下三个特点：
+
+    * Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
+    * Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
+    * Redis支持数据的备份，即master-slave模式的数据备份。
+
+    优势：
+
+    * 性能极高 – Redis能读的速度是110000次/s,写的速度是81000次/s 。
+    丰富的数据类型 – Redis支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。
+    * 原子 – Redis的所有操作都是原子性的，意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过MULTI和EXEC指令包起来。
+    * 丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。
+
+2. 安装
+
+    官网下载安装
+
+    启动：redis-server.exe redis.windows.conf
+
+    客户端启动：redis-cli.exe (不修改配置的话默认即可)
+
+    redis-cli.exe -h 127.0.0.1 -p 6379 -a password
+
+    * 基本文件
+
+        * redis-server:redis服务
+        * redis-cli:redis命令行工具
+        * redis-benchmark:基准性能测试工具
+        * redis-check-aof:AOF持久化文件检测和修复工具
+        * redis-check-dump:RDB持久化文件检测和修复工具
+        * redis-sentinel:启动哨兵
+        * redis-trib:cluster集群构建工具
 
 
+    * 基础命令
 
+        * keys *:redis允许模糊查询key　　有3个通配符 *、?、[]
+        * del key:删除key
+        * exists kxm:判断是否存在
+        * expire key 20:设置过期时间 - 秒
+        * pexpire key 20000:设置过期时间 - 毫秒
+        * move kxm 2:移动key到指定位置库中 2号库
+        * persist key:移除过期时间，key将会永久存在 成功设置返回1 否则返回0
+        * pttl key:以毫秒为单位返回 key 的剩余的过期时间
+        * ttl key:以秒为单位，返回给定 key 的剩余生存时间
+        * randomkey:从当前数据库中随机返回一个 key
+        * rename key newkxy:更改key的名字，如果重复了会覆盖
+        * renamenx kxm key:仅当 newkey 不存在时，将 key 改名为 newkey
+        * type key:返回 key 所储存的值的类型
+        * select 0:选择第一个库
+        * ping:返回PONG 表示连接正常
+        * quit:关闭当前连接
 
+    * 字符串命令
 
+        * set key aaa:设置指定 key 的值
+        * get key:获取指定 key 的值
+        * getrange key 0 1:返回 key 中字符串值的子字符 包含 0 和 1 包含关系
+        * getset key aaaaaaaa:将给定 key 的值设为 value ，并返回 key 的旧值(old value)
+        * mget key kxm:获取所有(一个或多个)给定 key 的值
+        * setex test 5 "this is my test":将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
+        * setnx test test:只有在 key 不存在时设置 key 的值 （用于分布式锁）
+        * strlen test:返回 key 所储存的字符串值的长度
+        * mset key1 "1" key2 "2":同时设置一个或多个 key-value 对
+        * msetnx key3 "a" key2 "b":同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在 其中一个失败则全部失败
+        * incr key:将 key 中储存的数字值增一 -> key的值 比如为 数字类型字符串 返回增加后的结果
+        * incrby num 1000:将 key 中储存的数字值增指定的值 -> key的值 比如为 数字类型字符串 返回增加后的结果
+        * decr key:同 -> 减一
+        * decrby num 500:同 -> 减指定值
+        * append key 1123123:如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾 返回字符串长度
 
+    * 哈希(Hash)命令
 
+        * hdel key field1 [field2]:删除一个或多个哈希表字段
+        * hexistskey field:查看哈希表 key 中，指定的字段是否存在
+        * hget key field:获取存储在哈希表中指定字段的值
+        * hgetall key:获取在哈希表中指定 key 的所有字段和值
+        * hincrby hash yeary 1:为哈希表 key 中的指定字段的整数值加上增量 increment
+        * hkeys hash:获取所有哈希表中的字段
+        * hlen hash:获取哈希表中字段的数量
+        * hmget hash name year:获取所有给定字段的值
+        * hmset hash name "i am kxm" year 24:同时将多个 field-value (域-值)对设置到哈希表 key 中
+        * hset hash name kxm:将哈希表 key 中的字段 field 的值设为 value
+        * hsetnx key field value:只有在字段 field 不存在时，设置哈希表字段的值
+        * hvals hash:获取哈希表中所有值
+        * hexists hash name:是否存在
 
+    * 列表(List)命令
 
+        Redis列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素到列表的头部（左边）或者尾部（右边）
 
+        一个列表最多可以包含 2^32 - 1 个元素 (4294967295, 每个列表超过40亿个元素)
 
+        容量 -> 集合,有序集合也是如此
 
+        * lpush list php:将一个值插入到列表头部 返回列表长度
+        * lindex list 0:通过索引获取列表中的元素
+        * blpop key1 [key2 ] timeout:移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+        * brpop key1 [key2 ] timeout:移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+        * linsert list before 3 4:在值 3 前插入 4 前即为顶
+        * linsert list after 4 5:在值4 后插入5
+        * llen list:获取列表长度
+        * lpop list:移出并获取列表的第一个元素
+        * lpush list c++ c:将一个或多个值插入到列表头部
+        * lrange list 0 1:获取列表指定范围内的元素 包含0和1 -1 代表所有 （lrange list 0 -1）
+        * lrem list 1 c:移除list 集合中 值为 c 的 一个元素， 1 代表count 即移除几个
+        * lset list 0 "this is update":通过索引设置列表元素的值
+        * ltrim list 1 5:对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
+        * rpop list:移除列表的最后一个元素，返回值为移除的元素
+        * rpush list newvalue3:从底部添加新值
+        * rpoplpush list list2:转移列表的数据
+
+    * 集合(Set)命令
+
+        Set 是 String 类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据
+
+        * sadd set java php c c++ python:向集合添加一个或多个成员
+        * scard set:获取集合的成员数
+        * sdiff key1 [key2]:返回给定所有集合的差集 数学含义差集
+        * sdiffstore curr set newset （sdiffstore destination key1 [key2]）:把set和 newset的差值存储到curr中
+        * sinter set newset:返回给定所有集合的交集
+        * sinterstore curr set newset （sinterstoredestination key1 [key2]）:同
+        * sismember set c#:判断 member 元素是否是集合 key 的成员
+        * smembers set:返回集合中的所有成员
+        * srandmember set 2:随机抽取两个key (抽奖实现美滋滋)
+        * smove set newtest java （smove source destination member）:将 member 元素从 source 集合移动到 destination 集合
+        * sunion set newset:返回所有给定集合的并集
+        * srem set java:删除
+        * spop set:从集合中弹出一个元素
+        * sdiff | sinter | sunion:操作：集合间运算：差集
+
+    * 有序集合(sorted set)命令
+
+        Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员。
+
+        不同的是每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。
+
+        有序集合的成员是唯一的,但分数(score)却可以重复。
+
+        * zadd sort 1 java 2 python:向有序集合添加一个或多个成员，或者更新已存在成员的分数
+        * zcard sort:获取有序集合的成员数
+        * zcount sort 0 1:计算在有序集合中指定区间分数的成员数
+        * zincrby sort 500 java:有序集合中对指定成员的分数加上增量 increment
+        * zscore sort java:返回有序集中，成员的分数值
+        * zrange sort 0 -1:获取指定序号的值，-1代表全部
+        * zrangebyscore sort 0 5:分数符合范围的值
+        * zrangebyscore sort 0 5 limit 0 1:分页 limit 0代表页码，1代表每页显示数量
+        * zrem sort java:移除元素
+        * zremrangebyrank sort 0 1:按照排名范围删除元素
+        * zremrangebyscore sort 0 1:按照分数范围删除元素
+        * zrevrank sort c#:返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+
+    * 发布订阅
+
+        A客户端订阅频道： subscribe redisChat （频道名字为 redisChat）
+
+        B客户端发布内容： publish redisChat "Hello, this is my wor"
+
+        * pubsub channels:查看当前redis 有多少个频道
+        * pubsub numsub chat1:查看某个频道的订阅者数量
+        * unsubscrible chat1:退订指定频道
+        * psubscribe java.*:订阅一组频道
+
+    * 事务
+
+        * redis 事务可以一次执行多个命令， 并且带有以下三个重要的保证：
+
+            * 批量操作在发送 EXEC 命令前被放入队列缓存
+            * 收到 EXEC 命令后进入事务执行，事务中任意命令执行失败，其余的命令依然被执行
+            * 在事务执行过程，其他客户端提交的命令请求不会插入到事务执行命令序列中
+            
+        * 一个事务从开始到执行会经历以下三个阶段：
+
+            * 开始事务
+            * 命令入队
+            * 执行事务
+
+        * multi:标记一个事务开始
+        * exec:执行事务
+        * discard:事务开始后输入命令入队过程中，中止事务
+        * watch key:监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断
+        * unwatch:取消 WATCH 命令对所有 key 的监视
+
+    * 服务器命令
+
+        * flushall:删除所有数据库的所有key
+        * flushdb:删除当前数据库的所有key
+        * save:同步保存数据到硬盘
+
+    * 数据备份与恢复
+
+        SAVE 命令用于创建当前数据库的备份
+
+        如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可。获取 redis 目录可以使用 CONFIG 命令
+
+    * 性能测试
+
+        ```sql
+        redis目录执行：redis-benchmark [option] [option value]
+
+        // 会返回各种操作的性能报告（100连接，10000请求）
+        redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 10000
+
+        // 100个字节作为value值进行压测
+        redis-benchmark -h 127.0.0.1 -p 6379 -q -d 100
+        ```

@@ -421,6 +421,20 @@
         ```sql
             SELECT Websites.name, Websites.url, SUM(access_log.count) AS nums FROM (access_log INNER JOIN Websites ON access_log.site_id=Websites.id) GROUP BY Websites.name HAVING SUM(access_log.count) > 200;
         ```
+
+    分析函数
+    * partition by
+
+        1. group by是分组函数，partition by是分析函数（然后像sum()等是聚合函数）
+        2. partition by 在执行完select之后，在所得结果集之上进行partition
+        3. partition by相比较于group by，能够在保留全部数据的基础上，只对其中某些字段做分组排序，而group by则只保留参与分组的字段和聚合函数的结果
+
+        ```sql
+        select [id],[account],[name],[identification] ,rank() over (partition by account,[name],identification order by [count]) as m from Participants
+        ```
+
+
+    关键字优先级：from > where > group by > having > order by
         
 
 ## 关系型数据库

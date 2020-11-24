@@ -322,6 +322,12 @@
         |string (variable)|可变长度字符串           |  Varchar  |  Varchar   |
         |binary object|二进制对象                  |Binary (fixed up to 8K) /Varbinary (<8K)/Image (<2GB)| Blob/Text |
 
+    * 备份
+
+        ```sql
+        backup database [name] to disk = 'D:\name.bak' with format;
+        ```
+
 3. SQL函数
 
     SQL Aggregate 函数计算从列中取得的值，返回一个单一的值。

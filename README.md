@@ -1,447 +1,604 @@
 # SQL
 
 * [基本语法](#基本语法)
+    * [最基本的SQL命令](#最基本的SQL命令)
+        * [SELECT-从数据库中提取数据](#SELECT-从数据库中提取数据)
+        * [UPDATE-更新数据库中的数据](#UPDATE-更新数据库中的数据)
+        * [DELETE-从数据库中删除数据](#DELETE-从数据库中删除数据)
+        * [INSERT INTO-向数据库中插入新数据](#INSERT_INTO-向数据库中插入新数据)
+        * [CREATE DATABASE-创建新数据库](#CREATE_DATABASE-创建新数据库)
+        * [ALTER DATABASE-修改数据库](#ALTER_DATABASE-修改数据库)
+        * [CREATE TABLE-创建新表](#CREATE_TABLE-创建新表)
+        * [ALTER TABLE-变更（改变）数据库表](#ALTER_TABLE-变更（改变）数据库表)
+        * [DROP TABLE-删除表](#DROP_TABLE-删除表)
+        * [CREATE INDEX-创建索引（搜索键）](#CREATE_INDEX-创建索引（搜索键）)
+        * [DROP INDEX-删除索引](#DROP_INDEX-删除索引)
+    * [SQL更多用法](#SQL更多用法)
+        * [like与通配符](#like与通配符)
+        * [in](#in)
+        * [between](#between)
+        * [as](#as)
+        * [join](#join)
+        * [union](#union)
+        * [select into](#select_into)
+        * [insert into select](#insert_into_select)
+        * [drop](#drop)
+        * [alert](#alert)
+        * [视图](#视图)
+        * [is](#is)
+        * [数据类型](#数据类型)
+        * [备份](#备份)
+    * [SQL函数](#SQL函数)
+        * [Aggregate](#Aggregate)
+            * [AVG()-返回平均值](#AVG()-返回平均值)
+            * [COUNT()-返回行数](#COUNT()-返回行数)
+            * [MAX()-返回最大值](#MAX()-返回最大值)
+            * [MIN()-返回最小值](#MIN()-返回最小值)
+            * [SUM()-返回总和](#SUM()-返回总和)
+        * [Scalar](#Scalar)
+            * [UCASE()-将某个字段转换为大写](#UCASE()-将某个字段转换为大写)
+            * [LCASE()-将某个字段转换为小写](#LCASE()-将某个字段转换为小写)
+            * [MID()-从某个文本字段提取从start开始的length个字符，MySql中使用](#MID()-从某个文本字段提取从start开始的length个字符，MySql中使用)
+            * [SubString(字段，1，end)-从某个文本字段提取字符](#SubString(字段，1，end)-从某个文本字段提取字符)
+            * [LEN()-返回某个文本字段的长度](#LEN()-返回某个文本字段的长度)
+            * [ROUND()-对某个数值字段进行指定小数位数的四舍五入](#ROUND()-对某个数值字段进行指定小数位数的四舍五入)
+            * [NOW()-返回当前的系统日期和时间](#NOW()-返回当前的系统日期和时间)
+            * [FORMAT()-格式化某个字段的显示方式](#FORMAT()-格式化某个字段的显示方式)
+        * [聚合](#聚合)
+            * [GROUP_BY](#GROUP_BY)
+            * [HAVING](#HAVING)
+        * [分析函数](#分析函数)
+            * [partition_by](#partition_by)
+        * [关键字优先级](#关键字优先级)
 * [关系型数据库](#关系型数据库)
     * [MySQL](#MySQL)
+        * [MySQL创建数据库并使用](#MySQL创建数据库并使用)
+        * [MySQL创建数据表](#MySQL创建数据表)
+        * [MySQL修改数据表](#MySQL修改数据表)
+        * [MySQL修改数据库](#MySQL修改数据库)
+        * [MySQL删除表索引](#MySQL删除表索引)
+        * [MySQL查询10-20条记录](#MySQL查询10-20条记录)
+        * [MySQL处理NULL值为0](#MySQL处理NULL值为0)
+        * [MySQL数据类型](#MySQL数据类型)
+        * [MySQL获取一段时间内的数据](#MySQL获取一段时间内的数据)
     * [MsSQL](#MsSQL)
+        * [MsSQL创建数据库](#MsSQL创建数据库)
+        * [MsSQL创建数据表](#MsSQL创建数据表)
+        * [MsSQL修改数据表](#MsSQL修改数据表)
+        * [MsSQL修改数据表](#MsSQL修改数据表)
+        * [MsSQL修改数据库](#MsSQL修改数据库)
+        * [MsSQL删除表索引](#MsSQL删除表索引)
+        * [MsSQL处理NULL值为0](#MsSQL处理NULL值为0)
+        * [MsSQL数据类型](#MsSQL数据类型)
+        * [MsSQL获取一段时间内的数据](#MsSQL获取一段时间内的数据)
 * [非关系型数据库](#非关系型数据库)
     * [MongoDB](#MongoDB)
+        * [MongoDB安装与配置](#MongoDB安装与配置)
+        * [MongoDB基础](#MongoDB基础)
+            * [ObjectId](#ObjectId)
+            * [字符串](#字符串)
+            * [时间戳](#时间戳)
+            * [日期](#日期)
+        * [MongoDB连接](#MongoDB连接)
+        * [MongoDB语法](#MongoDB语法)
+            * [MongoDB创建数据库](#MongoDB创建数据库)
+            * [MongoDB删除数据库](#MongoDB删除数据库)
+            * [MongoDB创建数据表(直接插入数据也能创建)](#MongoDB创建数据表(直接插入数据也能创建))
+            * [MongoDB删除数据表](#MongoDB删除数据表)
+            * [MongoDB插入数据](#MongoDB插入数据)
+            * [MongoDB更新数据](#MongoDB更新数据)
+            * [MongoDB删除数据](#MongoDB删除数据)
+            * [MongoDB查询数据](#MongoDB查询数据)
+            * [type操作符(类型匹配)](#$type操作符(类型匹配))
+            * [limit与skip](#limit与skip)
+            * [MongoDB索引](#MongoDB索引)
+                * [MongoDB创建索引](#MongoDB创建索引)
+                * [MongoDB覆盖索引查询(不从数据库找数据)](#MongoDB覆盖索引查询(不从数据库找数据))
+                * [MongoDB索引子文档字段](#MongoDB索引子文档字段)
+                * [MongoDB索引限制](#MongoDB索引限制)
+            * [aggregate聚合](#aggregate聚合)
+            * [MongoDB管道](#MongoDB管道)
+        * [MongoDB技术与原理](#MongoDB技术与原理)
+            * [MongoDB复制（副本集）](#MongoDB复制（副本集）)
+            * [MongoDB分片](#MongoDB分片)
+            * [MongoDB备份(mongodump)与恢复(mongorestore)](#MongoDB备份(mongodump)与恢复(mongorestore))
+            * [MongoDB监控](#MongoDB监控)
+        * [MongoDB高级应用](#MongoDB高级应用)
+            * [MongoDB关系](#MongoDB关系)
+                * [嵌入式关系](#嵌入式关系)
+                * [引用式关系](#引用式关系)
+            * [MongoDB查询分析](#MongoDB查询分析)
+            * [MongoDB原子操作](#MongoDB原子操作)
+                * [set](#$set)
+                * [unset](#$unset)
+                * [inc](#$inc)
+                * [push](#$push)
+                * [pushAll](#$pushAll)
+                * [pull](#$pull)
+                * [addToSet](#$addToSet)
+                * [spopet](#$pop)
+                * [rename](#$rename)
+                * [bit](#$bit)
+                * [偏移操作符](#偏移操作符)
+                * [Map_Reduce大型聚合查询](#Map_Reduce大型聚合查询)
+            * [MongoDB全文检索](#MongoDB全文检索)
+            * [GridFS](#GridFS)
+            * [MongoDB固定集合（Capped Collections）](#MongoDB固定集合（Capped_Collections）)
+            * [MongoDB_id自动增长](#MongoDB_id自动增长)
     * [redis](#redis)
+        * [redis概述](#redis概述)
+        * [redis安装](#redis安装)
+        * [redis基本文件](#redis基本文件)
+        * [redis基础命令](#redis基础命令)
+        * [redis字符串命令](#redis字符串命令)
+        * [redis哈希(Hash)命令](#redis哈希(Hash)命令)
+        * [redis列表(List)命令](#redis列表(List)命令)
+        * [redis集合(Set)命令](#redis集合(Set)命令)
+        * [redis有序集合(sorted set)命令](#redis有序集合sorted_set)命令)
+        * [redis发布订阅](#redis发布订阅)
+        * [redis事务](#redis事务)
+        * [redis服务器命令](#redis服务器命令)
+        * [redis数据备份与恢复](#redis数据备份与恢复)
+        * [redis性能测试](#redis性能测试)
 ---
 
 ## 基本语法
 
-1. 最基本的 SQL 命令：
-    * SELECT - 从数据库中提取数据
-        ```sql
-            SELECT column_name1,column_name2 FROM table_name;
-            SELECT * FROM table_name;
-        ```
-    * UPDATE - 更新数据库中的数据
-        ```sql
-            UPDATE table_name SET column1=value1,column2=value2,... WHERE some_column=some_value;
-        ```
-    * DELETE - 从数据库中删除数据
-        ```sql
-            DELETE FROM table_name WHERE some_column=some_value;
-        ```
-    * INSERT INTO - 向数据库中插入新数据
-        ```sql
-            INSERT INTO table_name VALUES (value1,value2,value3,...);
-            INSERT INTO table_name (column1,column2,column3,...) VALUES (value1,value2,value3,...);
-        ```
-    * CREATE DATABASE - 创建新数据库
-        ```sql
-            create database test;
-        ```
-    * ALTER DATABASE - 修改数据库
-    * CREATE TABLE - 创建新表
-        ```sql
-            CREATE TABLE Persons
-            (
-                PersonID int,
-                LastName varchar(255),
-                FirstName varchar(255),
-                Address varchar(255),
-                City varchar(255)
-            );
-        ```
-
-        约束：
-        * NOT NULL - 指示某列不能存储 NULL 值。
-        * UNIQUE - 保证某列的每行必须有唯一的值。
-        * PRIMARY KEY - NOT NULL 和 UNIQUE 的结合。确保某列（或两个列多个列的结合）有唯一标识，有助于更容易更快速地找到表中的一个特定的记录。
-        * FOREIGN KEY - 保证一个表中的数据匹配另一个表中的值的参照完整性。
-        * CHECK - 保证列中的值符合指定的条件。
-        * DEFAULT - 规定没有给列赋值时的默认值。
-
-        删除约束：
-        ```sql
-            alter table x modify column_name null;
-            alter table x modify column_name not null;
-
-            ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (P_Id,LastName);
-            --撤销 UNIQUE:
-            --MySQL
-            ALTER TABLE Persons DROP INDEX uc_PersonID
-            --MsSQL
-            ALTER TABLE Persons DROP CONSTRAINT uc_PersonID
-
-            ALTER TABLE Persons ADD CONSTRAINT pk_PersonID PRIMARY KEY (P_Id,LastName);
-            --撤销 PRIMARY KEY:
-            --MySQL
-            ALTER TABLE Persons DROP PRIMARY KEY
-            --MsSQL
-            ALTER TABLE Persons DROP CONSTRAINT pk_PersonID
-
-            ALTER TABLE Orders ADD FOREIGN KEY (P_Id) REFERENCES Persons(P_Id);
-            --命名 FOREIGN KEY 约束，并定义多个列的 FOREIGN KEY 约束
-            ALTER TABLE Orders ADD CONSTRAINT fk_PerOrders FOREIGN KEY (P_Id) REFERENCES Persons(P_Id)
-            --撤销 FOREIGN KEY:
-            --MySQL
-            ALTER TABLE Orders DROP FOREIGN KEY fk_PerOrders
-            --MsSQL
-            ALTER TABLE Orders DROP CONSTRAINT fk_PerOrders
-
-            ALTER TABLE Persons ADD CONSTRAINT chk_Person CHECK (P_Id>0 AND City='Sandnes');
-            --撤销 CHECK:
-            --MySQL
-            ALTER TABLE Persons DROP CHECK chk_Person
-            --MsSQL
-            ALTER TABLE Persons DROP CONSTRAINT chk_Person
-
-            --添加default
-            --MySQL
-            ALTER TABLE Persons ALTER City SET DEFAULT 'SANDNES'
-            --MsSQL
-            ALTER TABLE Persons ADD CONSTRAINT ab_c DEFAULT 'SANDNES' for City
-            --撤销default
-            --MySQL
-            ALTER TABLE Persons ALTER City DROP DEFAULT
-            --MsSQL
-            ALTER TABLE Persons ALTER COLUMN City DROP DEFAULT
-        ```
-
-    * ALTER TABLE - 变更（改变）数据库表
-        ```sql
-            ALTER TABLE table_name ADD column_name datatype;
-            ALTER TABLE table_name DROP COLUMN column_name
-        ```
-    * DROP TABLE - 删除表
-        ```sql
-            DROP TABLE table_name;
-            DROP DATABASE database_name;
-        ```
-    * CREATE INDEX - 创建索引（搜索键）
-
-        在表中创建索引，以便更加快速高效地查询数据。
-
-        用户无法看到索引，它们只能被用来加速搜索/查询。
-
-        更新一个包含索引的表需要比更新一个没有索引的表花费更多的时间，这是由于索引本身也需要更新。因此，理想的做法是仅仅在常常被搜索的列（以及表）上面创建索引。
-
-        ```sql
-            CREATE INDEX index_name ON table_name (column_name);
-            CREATE UNIQUE INDEX index_name ON table_name (column_name)
-        ```
-
-        [详细了解索引](https://www.cnblogs.com/hyd1213126/p/5828937.html)
-
-    * DROP INDEX - 删除索引
-
-2. SQL更多用法：
-
-    * like与通配符
-
-        ```sql
-            SELECT * FROM Websites WHERE name LIKE 'G%';
-            --选取 name 以 "G"、"F" 或 "s" 开始
-            SELECT * FROM Websites WHERE name REGEXP '^[GFs]';
-            --选取 name 以 A 到 H 字母开头
-            SELECT * FROM Websites WHERE name REGEXP '^[A-H]';
-            --选取 name 不以 A 到 H 字母开头
-            SELECT * FROM Websites WHERE name REGEXP '^[^A-H]';
-            --将搜索下列字符串：Carsen、Karsen、Carson 和 Karson（如 Carson）。
-            SELECT * FROM Websites WHERE name LIKE '[CK]ars[eo]n';
-            --将搜索以字符串 inger 结尾、以从 M 到 Z 的任何单个字母开头的所有名称（如 Ringer）。
-            SELECT * FROM Websites WHERE name LIKE '[M-Z]inger';
-            --将搜索以字母 M 开头，并且第二个字母不是 c 的所有名称（如MacFeather）。
-            SELECT * FROM Websites WHERE name LIKE 'M[^c]%';
-            --'%a'          以a结尾的数据
-            --'a%'          以a开头的数据
-            --'%a%'         含有a的数据
-            --'_a_'         三位且中间字母是a的
-            --'_a'          两位且结尾字母是a的
-            --'a_'          两位且开头字母是a的
-            --[charlist]	字符列中的任何单一字符
-            --[^charlist]   不在字符列中的任何单一字符
-            --[!charlist]	不在字符列中的任何单一字符
-        ```
-
-    * in
-
-        ```sql
-            select * from Websites where name in ('value1','value2');
-            select * from Websites where name='value1' or name='value2';
-            --mysql会转化为exists，弊端：a表(外表)使用不了索引，必须全表扫描，因为是拿a表的数据到b表查。而且必须得使用a表的数据到b表中查（外表到里表中），顺序是固定死的。
-            select * from a where exists(select * from b where b.id=a.id );
-        ```
-
-        in的效率提升
-        ```sql
-            select * from a where id in (select id from b );
-            改为
-            select * from a inner join b on a.id=b.id; 
-        ```
-
-        如果in条件规模小，则考虑使用in，否则考虑使用inner join
-
-    * between
-
-        mysql和mssql 字母和数字包含边界值,日期不包含右边界，因为‘2016-05-14’为‘2016-05-14 00:00:00’，所以不包含结束当天。
-
-        ```sql
-            SELECT column_name(s) FROM table_name WHERE column_name BETWEEN value1 AND value2;
-            SELECT * FROM Websites WHERE alexa NOT BETWEEN 1 AND 20;
-            SELECT * FROM Websites WHERE name BETWEEN 'A' AND 'H';
-            SELECT * FROM Websites WHERE name NOT BETWEEN 'A' AND 'H';
-            SELECT * FROM access_log WHERE date BETWEEN '2016-05-10' AND '2016-05-14';
-        ```
-
-    * as
-
-        在下面的情况下，使用别名很有用：
-        * 在查询中涉及超过一个表
-        * 在查询中使用了函数
-        * 列名称很长或者可读性差
-        * 需要把两个列或者多个列结合在一起
-
-        ```sql
-            SELECT column_name AS column_alias_name FROM table_name AS table_alias_name;
-        ```
-
-    * join
-
-        * INNER JOIN：如果表中有至少一个匹配，则返回行
-        * LEFT JOIN：即使右表中没有匹配，也从左表返回所有的行
-        * RIGHT JOIN：即使左表中没有匹配，也从右表返回所有的行
-        * FULL OUTER JOIN：只要其中一个表中存在匹配，则返回行(MySQL中不支持 FULL OUTER JOIN,使用UNION实现)
-
-        ```sql
-            --on条件成立，且table1与table2不能出现null，组合成新表
-            SELECT column_name(s) FROM table1 INNER JOIN table2 ON table1.column_name=table2.column_name;
-            --on条件成立，且table1不能出现null，table2可出现null，组合成新表
-            SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name;
-            --on条件成立，且table1可出现null，table2不能出现null，组合成新表
-            SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name;
-            --on条件成立，且table1与table2可出现null，组合成新表
-            SELECT column_name(s) FROM table1 FULL OUTER JOIN table2 ON table1.column_name=table2.column_name;
-            --mysql实现FULL OUTER JOIN
-            SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name
-            UNION
-            SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name
-        ```
-
-    * union
-
-        UNION 内部的每个 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。每个 SELECT 语句中的列的顺序必须相同。UNION 默认选取不同的值。UNION ALL允许重复的值。
-
-        ```sql
-            SELECT column_name(s) FROM table1
-            UNION
-            SELECT column_name(s) FROM table2;
-
-            SELECT column_name(s) FROM table1
-            UNION ALL
-            SELECT column_name(s) FROM table2;
-        ```
-
-    * select into
-
-        从一个表复制数据，然后把数据插入到另一个新表中
-
-        ```sql
-            SELECT column_name(s) INTO newtable FROM table1;
-        ```
-
-        mysql替代方法
-        ```sql
-            CREATE TABLE 新表
-            AS
-            SELECT * FROM 旧表 
-        ```
-
-    * insert into select
-
-        从一个表复制数据，插入到一个已存在的表中,目标表中任何已存在的行都不会受影响。
-
-        ```sql
-            INSERT INTO table1 (a, b) SELECT c, d FROM table2 WHERE id=1;
-        ```
-
-    * drop
-
-        ```sql
-            drop 类型(表，列，索引) 名字
-        ```
-
-    * alert
-
-        ```sql
-            alert 类型(表，列，索引) 名字 操作(add,drop,modify) 类型(表，列，索引) 名字 [新值]
-        ```
-
-    * 视图
-
-        视图是基于 SQL 语句的结果集的可视化的表。
-        视图包含行和列，就像一个真实的表。视图中的字段就是来自一个或多个数据库中的真实的表中的字段。
-
-        ```sql
-            CREATE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition;
-            CREATE VIEW [Products Above Average Price] AS SELECT ProductName,UnitPrice FROM Products WHERE UnitPrice>(SELECT AVG(UnitPrice) FROM Products)
-
-            CREATE OR REPLACE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition
-            DROP VIEW view_name
-        ```
-
-    * is
-
-        ```sql
-            SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NULL;
-            SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NOT NULL
-        ```
-
-    * 数据类型
-
-        |   数据类型   |          解析             |   mssql   |   mysql   |
-        |-------------|--------------------------|-----------|-----------|
-        |CHARACTER(n) |字符/字符串。固定长度 n。     |           |           |
-        |VARCHAR(n) 或CHARACTER VARYING(n)|字符/字符串。可变长度。最大长度 n。|||
-        |BINARY(n)    |二进制串。固定长度 n。       |           |            |
-        |BOOLEAN	  |存储 TRUE 或 FALSE 值      |    bit    | tinyint(1) |
-        |VARBINARY(n) 或 BINARY VARYING(n)|二进制串。可变长度。最大长度 n。|||
-        |INTEGER(p)	  |整数值（没有小数点）。精度 p。 |           |            |
-        |SMALLINT	  |整数值（没有小数点）。精度 5。 |           |            |
-        |INTEGER	  |整数值（没有小数点）。精度 10。|    int    |int/integer |
-        |BIGINT	      |整数值（没有小数点）。精度 19。|           |            |
-        |DECIMAL(p,s) |精确数值，精度 p，小数点后位数 s。例如：decimal(5,2) 是一个小数点前有 3 位数小数点后有 2 位数的数字。         |           |            |
-        |NUMERIC(p,s) |精确数值，精度 p，小数点后位数 s。（与 DECIMAL 相同）|||
-        |FLOAT(p)     |近似数值，尾数精度 p。一个采用以 10 为基数的指数计数法的浮点数。该类型的 size 参数由一个指定最小精度的单一数字组成。|           |           |
-        |REAL         |近似数值，尾数精度 7。        |           |            |
-        |FLOAT        |近似数值，尾数精度 16。       |Float/Real |   Float    |
-        |DOUBLE PRECISION|近似数值，尾数精度 16。    |           |            |
-        |DATE         |存储年、月、日的值。          |           |            |
-        |TIME         |存储小时、分、秒的值。         |           |            |
-        |TIMESTAMP    |存储年、月、日、小时、分、秒的值。|           |           |
-        |INTERVAL     |由一些整数字段组成，代表一段时间，取决于区间的类型。|||
-        |ARRAY        |元素的固定长度的有序集合       |           |            |
-        |MULTISET     |元素的可变长度的无序集合       |           |            |
-        |XML          |存储 XML 数据               |           |            |
-        |Currency     |货币                        |    Money  |numeric(15,4)|
-        |string (fixed)|固定长度字符串              |    Char   |    Char    |
-        |string (variable)|可变长度字符串           |  Varchar  |  Varchar   |
-        |binary object|二进制对象                  |Binary (fixed up to 8K) /Varbinary (<8K)/Image (<2GB)| Blob/Text |
-
-    * 备份
-
-        ```sql
-        backup database [name] to disk = 'D:\name.bak' with format;
-        ```
-
-3. SQL函数
-
-    SQL Aggregate 函数计算从列中取得的值，返回一个单一的值。
-    * AVG() - 返回平均值
-    
-        ```sql
-            SELECT site_id, count FROM access_log WHERE count > (SELECT AVG(count) FROM access_log);
-        ```
-
-    * COUNT() - 返回行数
-
-        ```sql
-            SELECT COUNT(column_name) FROM table_name;--排除null
-            SELECT COUNT(*) FROM table_name;
-            SELECT COUNT(DISTINCT column_name) FROM table_name;--不同值
-        ```
-
-    * MAX() - 返回最大值
-
-        ```sql
-            SELECT MAX(column_name) FROM table_name;
-        ```
-
-    * MIN() - 返回最小值
-
-        ```sql
-            SELECT MIN(column_name) FROM table_name;
-        ```
-        
-    * SUM() - 返回总和
-
-        ```sql
-            SELECT SUM(column_name) FROM table_name;
-        ```
-        
-
-    SQL Scalar 函数基于输入值，返回一个单一的值。
-    * UCASE() - 将某个字段转换为大写
-
-        ```sql
-            SELECT UCASE(column_name) FROM table_name;
-            --mssql
-            SELECT UPPER(column_name) FROM table_name;
-        ```
-        
-    * LCASE() - 将某个字段转换为小写
-
-        ```sql
-            SELECT LCASE(column_name) FROM table_name;
-            --mssql
-            SELECT LOWER(column_name) FROM table_name;
-        ```
-        
-    * MID() - 从某个文本字段提取从start开始的length个字符，MySql 中使用
-
-        ```sql
-            SELECT MID(column_name,start[,length]) FROM table_name;
-        ```
-        
-    * SubString(字段，1，end) - 从某个文本字段提取字符
-    * LEN() - 返回某个文本字段的长度
-
-        ```sql
-            SELECT LEN(column_name) FROM table_name;
-            --mysql
-            SELECT LENGTH(column_name) FROM table_name;
-        ```
-        
-    * ROUND() - 对某个数值字段进行指定小数位数的四舍五入
-
-        ```sql
-            SELECT ROUND(column_name,decimals) FROM table_name;
-        ```
-        
-    * NOW() - 返回当前的系统日期和时间
-
-        ```sql
-            SELECT name, url, Now() AS date FROM Websites;
-        ```
-        
-    * FORMAT() - 格式化某个字段的显示方式
-
-        ```sql
-            SELECT name, url, DATE_FORMAT(Now(),'%Y-%m-%d') AS date FROM Websites;
-        ```
-        
-
-    聚合
-    * GROUP BY
-
-        ```sql
-            SELECT site_id, SUM(access_log.count) AS nums FROM access_log GROUP BY site_id;
-        ```
-        
-    * HAVING
-
-        ```sql
-            SELECT Websites.name, Websites.url, SUM(access_log.count) AS nums FROM (access_log INNER JOIN Websites ON access_log.site_id=Websites.id) GROUP BY Websites.name HAVING SUM(access_log.count) > 200;
-        ```
-
-    分析函数
-    * partition by
-
-        1. group by是分组函数，partition by是分析函数（然后像sum()等是聚合函数）
-        2. partition by 在执行完select之后，在所得结果集之上进行partition
-        3. partition by相比较于group by，能够在保留全部数据的基础上，只对其中某些字段做分组排序，而group by则只保留参与分组的字段和聚合函数的结果
-
-        ```sql
-        select [id],[account],[name],[identification] ,rank() over (partition by account,[name],identification order by [count]) as m from Participants
-        ```
-
-
-    关键字优先级：from > where > group by > having > order by
-        
+### 最基本的SQL命令
+
+#### SELECT-从数据库中提取数据
+
+```sql
+SELECT column_name1,column_name2 FROM table_name;
+SELECT * FROM table_name;
+```
+
+#### UPDATE-更新数据库中的数据
+
+```sql
+UPDATE table_name SET column1=value1,column2=value2,... WHERE some_column=some_value;
+```
+
+#### DELETE-从数据库中删除数据
+
+```sql
+DELETE FROM table_name WHERE some_column=some_value;
+```
+
+#### INSERT_INTO-向数据库中插入新数据
+
+```sql
+INSERT INTO table_name VALUES (value1,value2,value3,...);
+INSERT INTO table_name (column1,column2,column3,...) VALUES (value1,value2,value3,...);
+```
+
+#### CREATE_DATABASE-创建新数据库
+
+```sql
+create database test;
+```
+
+#### ALTER_DATABASE-修改数据库
+
+#### CREATE_TABLE-创建新表
+
+```sql
+CREATE TABLE Persons
+(
+    PersonID int,
+    LastName varchar(255),
+    FirstName varchar(255),
+    Address varchar(255),
+    City varchar(255)
+);
+```
+
+约束：
+* NOT NULL - 指示某列不能存储 NULL 值。
+* UNIQUE - 保证某列的每行必须有唯一的值。
+* PRIMARY KEY - NOT NULL 和 UNIQUE 的结合。确保某列（或两个列多个列的结合）有唯一标识，有助于更容易更快速地找到表中的一个特定的记录。
+* FOREIGN KEY - 保证一个表中的数据匹配另一个表中的值的参照完整性。
+* CHECK - 保证列中的值符合指定的条件。
+* DEFAULT - 规定没有给列赋值时的默认值。
+
+删除约束：
+```sql
+alter table x modify column_name null;
+alter table x modify column_name not null;
+
+ALTER TABLE Persons ADD CONSTRAINT uc_PersonID UNIQUE (P_Id,LastName);
+--撤销 UNIQUE:
+--MySQL
+ALTER TABLE Persons DROP INDEX uc_PersonID
+--MsSQL
+ALTER TABLE Persons DROP CONSTRAINT uc_PersonID
+
+ALTER TABLE Persons ADD CONSTRAINT pk_PersonID PRIMARY KEY (P_Id,LastName);
+--撤销 PRIMARY KEY:
+--MySQL
+ALTER TABLE Persons DROP PRIMARY KEY
+--MsSQL
+ALTER TABLE Persons DROP CONSTRAINT pk_PersonID
+
+ALTER TABLE Orders ADD FOREIGN KEY (P_Id) REFERENCES Persons(P_Id);
+--命名 FOREIGN KEY 约束，并定义多个列的 FOREIGN KEY 约束
+ALTER TABLE Orders ADD CONSTRAINT fk_PerOrders FOREIGN KEY (P_Id) REFERENCES Persons(P_Id)
+--撤销 FOREIGN KEY:
+--MySQL
+ALTER TABLE Orders DROP FOREIGN KEY fk_PerOrders
+--MsSQL
+ALTER TABLE Orders DROP CONSTRAINT fk_PerOrders
+
+ALTER TABLE Persons ADD CONSTRAINT chk_Person CHECK (P_Id>0 AND City='Sandnes');
+--撤销 CHECK:
+--MySQL
+ALTER TABLE Persons DROP CHECK chk_Person
+--MsSQL
+ALTER TABLE Persons DROP CONSTRAINT chk_Person
+
+--添加default
+--MySQL
+ALTER TABLE Persons ALTER City SET DEFAULT 'SANDNES'
+--MsSQL
+ALTER TABLE Persons ADD CONSTRAINT ab_c DEFAULT 'SANDNES' for City
+--撤销default
+--MySQL
+ALTER TABLE Persons ALTER City DROP DEFAULT
+--MsSQL
+ALTER TABLE Persons ALTER COLUMN City DROP DEFAULT
+```
+
+#### ALTER_TABLE-变更（改变）数据库表
+
+```sql
+ALTER TABLE table_name ADD column_name datatype;
+ALTER TABLE table_name DROP COLUMN column_name
+```
+
+#### DROP_TABLE-删除表
+
+```sql
+DROP TABLE table_name;
+DROP DATABASE database_name;
+```
+
+#### CREATE_INDEX-创建索引（搜索键）
+
+在表中创建索引，以便更加快速高效地查询数据。
+
+用户无法看到索引，它们只能被用来加速搜索/查询。
+
+更新一个包含索引的表需要比更新一个没有索引的表花费更多的时间，这是由于索引本身也需要更新。因此，理想的做法是仅仅在常常被搜索的列（以及表）上面创建索引。
+
+```sql
+CREATE INDEX index_name ON table_name (column_name);
+CREATE UNIQUE INDEX index_name ON table_name (column_name)
+```
+
+[详细了解索引](https://www.cnblogs.com/hyd1213126/p/5828937.html)
+
+#### DROP_INDEX-删除索引
+
+### SQL更多用法
+
+#### like与通配符
+
+```sql
+SELECT * FROM Websites WHERE name LIKE 'G%';
+--选取 name 以 "G"、"F" 或 "s" 开始
+SELECT * FROM Websites WHERE name REGEXP '^[GFs]';
+--选取 name 以 A 到 H 字母开头
+SELECT * FROM Websites WHERE name REGEXP '^[A-H]';
+--选取 name 不以 A 到 H 字母开头
+SELECT * FROM Websites WHERE name REGEXP '^[^A-H]';
+--将搜索下列字符串：Carsen、Karsen、Carson 和 Karson（如 Carson）。
+SELECT * FROM Websites WHERE name LIKE '[CK]ars[eo]n';
+--将搜索以字符串 inger 结尾、以从 M 到 Z 的任何单个字母开头的所有名称（如 Ringer）。
+SELECT * FROM Websites WHERE name LIKE '[M-Z]inger';
+--将搜索以字母 M 开头，并且第二个字母不是 c 的所有名称（如MacFeather）。
+SELECT * FROM Websites WHERE name LIKE 'M[^c]%';
+--'%a'          以a结尾的数据
+--'a%'          以a开头的数据
+--'%a%'         含有a的数据
+--'_a_'         三位且中间字母是a的
+--'_a'          两位且结尾字母是a的
+--'a_'          两位且开头字母是a的
+--[charlist]	字符列中的任何单一字符
+--[^charlist]   不在字符列中的任何单一字符
+--[!charlist]	不在字符列中的任何单一字符
+```
+
+#### in
+
+```sql
+select * from Websites where name in ('value1','value2');
+select * from Websites where name='value1' or name='value2';
+--mysql会转化为exists，弊端：a表(外表)使用不了索引，必须全表扫描，因为是拿a表的数据到b表查。而且必须得使用a表的数据到b表中查（外表到里表中），顺序是固定死的。
+select * from a where exists(select * from b where b.id=a.id );
+```
+
+in的效率提升
+```sql
+select * from a where id in (select id from b );
+改为
+select * from a inner join b on a.id=b.id; 
+```
+
+如果in条件规模小，则考虑使用in，否则考虑使用inner join
+
+#### between
+
+mysql和mssql 字母和数字包含边界值,日期不包含右边界，因为‘2016-05-14’为‘2016-05-14 00:00:00’，所以不包含结束当天。
+
+```sql
+SELECT column_name(s) FROM table_name WHERE column_name BETWEEN value1 AND value2;
+SELECT * FROM Websites WHERE alexa NOT BETWEEN 1 AND 20;
+SELECT * FROM Websites WHERE name BETWEEN 'A' AND 'H';
+SELECT * FROM Websites WHERE name NOT BETWEEN 'A' AND 'H';
+SELECT * FROM access_log WHERE date BETWEEN '2016-05-10' AND '2016-05-14';
+```
+
+#### as
+
+在下面的情况下，使用别名很有用：
+* 在查询中涉及超过一个表
+* 在查询中使用了函数
+* 列名称很长或者可读性差
+* 需要把两个列或者多个列结合在一起
+
+```sql
+SELECT column_name AS column_alias_name FROM table_name AS table_alias_name;
+```
+
+#### join
+
+* INNER JOIN：如果表中有至少一个匹配，则返回行
+* LEFT JOIN：即使右表中没有匹配，也从左表返回所有的行
+* RIGHT JOIN：即使左表中没有匹配，也从右表返回所有的行
+* FULL OUTER JOIN：只要其中一个表中存在匹配，则返回行(MySQL中不支持 FULL OUTER JOIN,使用UNION实现)
+
+```sql
+--on条件成立，且table1与table2不能出现null，组合成新表
+SELECT column_name(s) FROM table1 INNER JOIN table2 ON table1.column_name=table2.column_name;
+--on条件成立，且table1不能出现null，table2可出现null，组合成新表
+SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name;
+--on条件成立，且table1可出现null，table2不能出现null，组合成新表
+SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name;
+--on条件成立，且table1与table2可出现null，组合成新表
+SELECT column_name(s) FROM table1 FULL OUTER JOIN table2 ON table1.column_name=table2.column_name;
+--mysql实现FULL OUTER JOIN
+SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name
+UNION
+SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name
+```
+
+#### union
+
+UNION 内部的每个 SELECT 语句必须拥有相同数量的列。列也必须拥有相似的数据类型。每个 SELECT 语句中的列的顺序必须相同。UNION 默认选取不同的值。UNION ALL允许重复的值。
+
+```sql
+SELECT column_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2;
+
+SELECT column_name(s) FROM table1
+UNION ALL
+SELECT column_name(s) FROM table2;
+```
+
+#### select_into
+
+从一个表复制数据，然后把数据插入到另一个新表中
+
+```sql
+SELECT column_name(s) INTO newtable FROM table1;
+```
+
+mysql替代方法
+```sql
+CREATE TABLE 新表
+AS
+SELECT * FROM 旧表 
+```
+
+#### insert_into_select
+
+从一个表复制数据，插入到一个已存在的表中,目标表中任何已存在的行都不会受影响。
+
+```sql
+INSERT INTO table1 (a, b) SELECT c, d FROM table2 WHERE id=1;
+```
+
+#### drop
+
+```sql
+drop 类型(表，列，索引) 名字
+```
+
+#### alert
+
+```sql
+alert 类型(表，列，索引) 名字 操作(add,drop,modify) 类型(表，列，索引) 名字 [新值]
+```
+
+#### 视图
+
+视图是基于 SQL 语句的结果集的可视化的表。
+视图包含行和列，就像一个真实的表。视图中的字段就是来自一个或多个数据库中的真实的表中的字段。
+
+```sql
+CREATE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition;
+CREATE VIEW [Products Above Average Price] AS SELECT ProductName,UnitPrice FROM Products WHERE UnitPrice>(SELECT AVG(UnitPrice) FROM Products)
+
+CREATE OR REPLACE VIEW view_name AS SELECT column_name(s) FROM table_name WHERE condition
+DROP VIEW view_name
+```
+
+#### is
+
+```sql
+SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NULL;
+SELECT LastName,FirstName,Address FROM Persons WHERE Address IS NOT NULL
+```
+
+#### 数据类型
+
+|   数据类型   |          解析             |   mssql   |   mysql   |
+|-------------|--------------------------|-----------|-----------|
+|CHARACTER(n) |字符/字符串。固定长度 n。     |           |           |
+|VARCHAR(n) 或CHARACTER VARYING(n)|字符/字符串。可变长度。最大长度 n。|||
+|BINARY(n)    |二进制串。固定长度 n。       |           |            |
+|BOOLEAN	  |存储 TRUE 或 FALSE 值      |    bit    | tinyint(1) |
+|VARBINARY(n) 或 BINARY VARYING(n)|二进制串。可变长度。最大长度 n。|||
+|INTEGER(p)	  |整数值（没有小数点）。精度 p。 |           |            |
+|SMALLINT	  |整数值（没有小数点）。精度 5。 |           |            |
+|INTEGER	  |整数值（没有小数点）。精度 10。|    int    |int/integer |
+|BIGINT	      |整数值（没有小数点）。精度 19。|           |            |
+|DECIMAL(p,s) |精确数值，精度 p，小数点后位数 s。例如：decimal(5,2) 是一个小数点前有 3 位数小数点后有 2 位数的数字。         |           |            |
+|NUMERIC(p,s) |精确数值，精度 p，小数点后位数 s。（与 DECIMAL 相同）|||
+|FLOAT(p)     |近似数值，尾数精度 p。一个采用以 10 为基数的指数计数法的浮点数。该类型的 size 参数由一个指定最小精度的单一数字组成。|           |           |
+|REAL         |近似数值，尾数精度 7。        |           |            |
+|FLOAT        |近似数值，尾数精度 16。       |Float/Real |   Float    |
+|DOUBLE PRECISION|近似数值，尾数精度 16。    |           |            |
+|DATE         |存储年、月、日的值。          |           |            |
+|TIME         |存储小时、分、秒的值。         |           |            |
+|TIMESTAMP    |存储年、月、日、小时、分、秒的值。|           |           |
+|INTERVAL     |由一些整数字段组成，代表一段时间，取决于区间的类型。|||
+|ARRAY        |元素的固定长度的有序集合       |           |            |
+|MULTISET     |元素的可变长度的无序集合       |           |            |
+|XML          |存储 XML 数据               |           |            |
+|Currency     |货币                        |    Money  |numeric(15,4)|
+|string (fixed)|固定长度字符串              |    Char   |    Char    |
+|string (variable)|可变长度字符串           |  Varchar  |  Varchar   |
+|binary object|二进制对象                  |Binary (fixed up to 8K) /Varbinary (<8K)/Image (<2GB)| Blob/Text |
+
+#### 备份
+
+```sql
+backup database [name] to disk = 'D:\name.bak' with format;
+```
+
+### SQL函数
+
+#### Aggregate
+
+SQL Aggregate 函数计算从列中取得的值，返回一个单一的值。
+
+##### AVG()-返回平均值
+
+```sql
+SELECT site_id, count FROM access_log WHERE count > (SELECT AVG(count) FROM access_log);
+```
+
+##### COUNT()-返回行数
+
+```sql
+SELECT COUNT(column_name) FROM table_name;--排除null
+SELECT COUNT(*) FROM table_name;
+SELECT COUNT(DISTINCT column_name) FROM table_name;--不同值
+```
+
+##### MAX()-返回最大值
+
+```sql
+SELECT MAX(column_name) FROM table_name;
+```
+
+##### MIN()-返回最小值
+
+```sql
+SELECT MIN(column_name) FROM table_name;
+```
+
+##### SUM()-返回总和
+
+```sql
+SELECT SUM(column_name) FROM table_name;
+```
+
+#### Scalar
+
+SQL Scalar 函数基于输入值，返回一个单一的值。
+
+##### UCASE()-将某个字段转换为大写
+
+```sql
+SELECT UCASE(column_name) FROM table_name;
+--mssql
+SELECT UPPER(column_name) FROM table_name;
+```
+
+##### LCASE()-将某个字段转换为小写
+
+```sql
+SELECT LCASE(column_name) FROM table_name;
+--mssql
+SELECT LOWER(column_name) FROM table_name;
+```
+
+##### MID()-从某个文本字段提取从start开始的length个字符，MySql中使用
+
+```sql
+SELECT MID(column_name,start[,length]) FROM table_name;
+```
+
+##### SubString(字段，1，end)-从某个文本字段提取字符
+
+##### LEN()-返回某个文本字段的长度
+
+```sql
+SELECT LEN(column_name) FROM table_name;
+--mysql
+SELECT LENGTH(column_name) FROM table_name;
+```
+
+##### ROUND()-对某个数值字段进行指定小数位数的四舍五入
+
+```sql
+SELECT ROUND(column_name,decimals) FROM table_name;
+```
+
+##### NOW()-返回当前的系统日期和时间
+
+```sql
+SELECT name, url, Now() AS date FROM Websites;
+```
+
+##### FORMAT()-格式化某个字段的显示方式
+
+```sql
+SELECT name, url, DATE_FORMAT(Now(),'%Y-%m-%d') AS date FROM Websites;
+```
+
+#### 聚合
+
+##### GROUP_BY
+
+```sql
+SELECT site_id, SUM(access_log.count) AS nums FROM access_log GROUP BY site_id;
+```
+
+##### HAVING
+
+```sql
+SELECT Websites.name, Websites.url, SUM(access_log.count) AS nums FROM (access_log INNER JOIN Websites ON access_log.site_id=Websites.id) GROUP BY Websites.name HAVING SUM(access_log.count) > 200;
+```
+
+#### 分析函数
+
+##### partition_by
+
+1. group by是分组函数，partition by是分析函数（然后像sum()等是聚合函数）
+2. partition by 在执行完select之后，在所得结果集之上进行partition
+3. partition by相比较于group by，能够在保留全部数据的基础上，只对其中某些字段做分组排序，而group by则只保留参与分组的字段和聚合函数的结果
+
+```sql
+select [id],[account],[name],[identification] ,rank() over (partition by account,[name],identification order by [count]) as m from Participants
+```
+
+#### 关键字优先级
+
+from > where > group by > having > order by
 
 ## 关系型数据库
 
@@ -451,13 +608,15 @@ MySQL使用MySQL Workbench,MsSQL使用MicroSoft SQL Server Management Studio，�
 
 ### MySQL
 
-1. 创建数据库并使用
+#### MySQL创建数据库并使用
+
 ```sql
 CREATE DATABASE [ IF NOT EXISTS] test [ CHARACTER SET utf8 ];
 use test;
 ```
 
-2. 创建数据表
+#### MySQL创建数据表
+
 ```sql
 create table tutorials_tbl(
    tutorial_id INT NOT NULL AUTO_INCREMENT,
@@ -468,7 +627,8 @@ create table tutorials_tbl(
 );
 ```
 
-3. 修改数据表
+#### MySQL修改数据表
+
 ```sql
 ALTER TABLE table_name
 MODIFY COLUMN column_name datatype
@@ -489,7 +649,8 @@ ALTER TABLE testalter_tbl CHANGE i j BIGINT;
 ALTER TABLE testalter_tbl MODIFY j BIGINT NOT NULL DEFAULT 100;
 ```
 
-4. 修改数据库
+#### MySQL修改数据库
+
 ```sql
 --1.将名为"例二数据库"的数据库改名为"例七数据库"
 alter database 例二数据库
@@ -593,24 +754,27 @@ alter database 例六数据库
 set auto_shrink on
 ```
 
-5. 删除表索引
+#### MySQL删除表索引
+
 ```sql
 ALTER TABLE table_name DROP INDEX index_name
 ```
 
-6. 查询10-20条记录
+#### MySQL查询10-20条记录
+
 ```sql
 select top10 * from (select top 20 * from order by column) order by column desc
 ```
 
 [详细了解mysql索引](https://www.cnblogs.com/whgk/p/6179612.html)
 
-7. 处理NULL值为0
+#### MySQL处理NULL值为0
+
 ```sql
 SELECT ProductName,UnitPrice*(UnitsInStock+ISNULL(UnitsOnOrder,0)) FROM Products
 ```
 
-8. 数据类型
+#### MySQL数据类型
 
 |    数据类型    |                      解析                      |     储存    |
 |--------------|------------------------------------------------|------------|
@@ -652,7 +816,8 @@ SELECT ProductName,UnitPrice*(UnitsInStock+ISNULL(UnitsOnOrder,0)) FROM Products
 
 4 或 8 字节
 
-9. 获取一段时间内的数据
+#### MySQL获取一段时间内的数据
+
 ```sql
 --一个月内
 select createtime from user where DATE_SUB(CURDATE(), INTERVAL 1 MONTH) <= date(createtime);
@@ -661,7 +826,8 @@ select createtime from user where DATE_SUB(CURDATE(), INTERVAL 1 MONTH) <= date(
 
 ### MsSQL
 
-1. 创建数据库
+#### MsSQL创建数据库
+
 ```sql
 use master
 go
@@ -692,7 +858,8 @@ log on
 )
 ```
 
-2. 创建数据表
+#### MsSQL创建数据表
+
 ```sql
 USE School
 
@@ -712,13 +879,15 @@ CREATE TABLE Teacher
 
 ```
 
-3. 修改数据表
+#### MsSQL修改数据表
+
 ```sql
 ALTER TABLE table_name
 ALTER COLUMN column_name datatype
 ```
 
-4. 修改数据库
+#### MsSQL修改数据库
+
 ```sql
 alter datebase db_name
 add file
@@ -738,25 +907,28 @@ modify file
 )
 ```
 
-5. 删除表索引
+#### MsSQL删除表索引
+
 ```sql
 DROP INDEX table_name.index_name
 ```
 
-6. 查询10-20条记录
+#### MsSQL查询10-20条记录
+
 ```sql
 select * from tablename where LIMIT 9,10
 ```
 
 [详细了解mssql索引](https://www.cnblogs.com/Brambling/p/6754993.html)
 
-7. 处理NULL值为0
+#### MsSQL处理NULL值为0
+
 ```sql
 SELECT ProductName,UnitPrice*(UnitsInStock+IFNULL(UnitsOnOrder,0)) FROM Products
 SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Products
 ```
 
-8. 数据类型
+#### MsSQL数据类型
 
 |    数据类型    |                             解析                             |
 |--------------|--------------------------------------------------------------|
@@ -785,7 +957,8 @@ SELECT ProductName,UnitPrice*(UnitsInStock+COALESCE(UnitsOnOrder,0)) FROM Produc
 |TIME()        |时间。格式：HH:MM:SS，从 '-838:59:59' 到 '838:59:59'            |
 |YEAR()	       |2 位或 4 位格式的年。4 位格式所允许的值：1901 到 2155。2 位格式所允许的值：70 到 69，表示从 1970 到 2069。|
 
-9. 获取一段时间内的数据
+#### MsSQL获取一段时间内的数据
+
 ```sql
 --10min内
 SELECT * FROM tablename WHERE 日期字段 > DATEADD(MINUTE,-10,GETDATE())
@@ -796,13 +969,13 @@ SELECT * FROM tablename WHERE datediff(mi,时间字段,getdate())<=10
 
 ### MongoDB
 
-1. 安装与配置
+#### MongoDB安装与配置
 
 * [初探MongoDB —— 介绍、安装和配置](https://www.cnblogs.com/jianglan/p/4423189.html)
 * [MongoDB基本操作 —— 用Mongo.exe操作数据库增删改查](https://www.cnblogs.com/jianglan/p/4430299.html)
 * [MongoDB可视化工具](https://robomongo.org/download)
 
-2. 基础
+#### MongoDB基础
 
 |SQL术语/概念|MongoDB术语/概念|解释/说明                       |
 |-----------|--------------|-------------------------------|
@@ -833,7 +1006,7 @@ SELECT * FROM tablename WHERE datediff(mi,时间字段,getdate())<=10
 |Regular expression|正则表达式类型。用于存储正则表达式。                          |
 
 
-* ObjectId
+##### ObjectId
 
 ObjectId 类似唯一主键，可以很快的去生成和排序，包含 12 bytes：
 1. 1-4表示创建 unix 时间戳,格林尼治时间 UTC 时间，比北京时间晚了 8 个小时
@@ -852,11 +1025,11 @@ newObject.str
 --5a1919e63df83ce79df8b38f
 ```
 
-* 字符串
+##### 字符串
 
 BSON 字符串都是 UTF-8 编码。
 
-* 时间戳
+##### 时间戳
 
 BSON 有一个特殊的时间戳类型用于 MongoDB 内部使用，与普通的 日期 类型不相关。 时间戳值是一个 64 位的值：
 1. 前32位是一个 time_t 值（与Unix新纪元相差的秒数）
@@ -865,7 +1038,7 @@ BSON 有一个特殊的时间戳类型用于 MongoDB 内部使用，与普通的
 
 在复制集中， oplog 有一个 ts 字段。这个字段中的值使用BSON时间戳表示了操作时间。
 
-* 日期
+##### 日期
 
 表示当前距离 Unix新纪元（1970年1月1日）的毫秒数。日期类型是有符号的, 负数表示 1970 年之前的日期。
 
@@ -894,7 +1067,7 @@ Date()
 --Sun Mar 04 2018 15:02:59 GMT+0000 (UTC)   
 ```
 
-3. 连接
+#### MongoDB连接
 
 标准 URI 连接:
 
@@ -946,20 +1119,23 @@ mongodb://localhost/?safe=true
 
 mongodb://host1,host2,host3/?safe=true;w=2;wtimeoutMS=2000
 
-4. 语法
+#### MongoDB语法
 
-* 创建数据库
+##### MongoDB创建数据库
+
 ```sql
 use DATABASE_NAME --创建数据库
 show dbs --查看所有数据库
 ```
 
-* 删除数据库
+##### MongoDB删除数据库
+
 ```sql
 db.dropDatabase() --删除数据库
 ```
 
-* 创建数据表(直接插入数据也能创建)
+##### MongoDB创建数据表(直接插入数据也能创建)
+
 ```sql
 db.createCollection(name, options)
 ```
@@ -971,20 +1147,23 @@ db.createCollection(name, options)
 |size       |数值|（可选）为固定集合指定一个最大值（以字节计）。<br>如果 capped 为 true，也需要指定该字段。|
 |max        |数值|（可选）指定固定集合中包含文档的最大数量。<br>在插入文档时，MongoDB 首先检查固定集合的 size 字段，然后检查 max 字段。|
 
-* 删除数据表
+##### MongoDB删除数据表
+
 ```sql
 show collections --查看数据表
 db.tablename.drop()  --删除数据表
 ```
 
-* 插入数据
+##### MongoDB插入数据
+
 ```sql
 db.COLLECTION_NAME.insert(json) --插入数据
 db.collection.insertOne({"a": 3}) --插入单条数据
 db.collection.insertMany([{"b": 3}, {'c': 4}]) --插入多条数据
 ```
 
-* 更新数据
+##### MongoDB更新数据
+
 ```sql
 db.collection.update(
    <query>,
@@ -1010,13 +1189,15 @@ db.col.save({
 }) --替换数据
 db.col.update({"_id":"56064f89ade2f21f36b03136"}, {$unset:{ "test2" : "OK"}}) --移除键值对
 ```
+
 * query : update的查询条件，类似sql update查询内where后面的。
 * update : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
 * upsert : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
 * multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
 * writeConcern :可选，抛出异常的级别。
 
-* 删除数据
+##### MongoDB删除数据
+
 ```sql
 db.collection.remove(
    <query>,
@@ -1036,9 +1217,8 @@ db.inventory.deleteOne( { status: "D" } ) --删除 status 等于 D 的一个文�
 * justOne : （可选）如果设为 true 或 1，则只删除一个文档。
 * writeConcern :（可选）抛出异常的级别。
 
----
+##### MongoDB查询数据
 
-* 查询数据
 ```sql
 db.collection.find(query, projection)
 db.col.find().pretty() --以易读的方式来读取数据
@@ -1104,9 +1284,7 @@ db.col.find({title:/^教/})
 
 db.col.find({title:/教$/})
 
----
-
-* $type 操作符 (类型匹配)
+##### $type操作符(类型匹配)
 
 |类型	             |数字   |备注           |
 |-------------------|-------|--------------|
@@ -1135,7 +1313,7 @@ db.col.find({"title" : {$type : 2}})
 db.col.find({"title" : {$type : 'string'}})
 ```
 
-* limit与skip
+##### limit与skip
 
 limit(n) 是用来规定显示的条数，而 skip(n) 是用来在符合条件的记录中从第一个记录跳过的条数，这两个函数可以交换使用。
 ```sql
@@ -1145,7 +1323,7 @@ db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)
 db.COLLECTION_NAME.find().skip(10).limit(100)
 ```
 
-* sort排序
+##### sort排序
 
 ```sql
 --1 为升序，-1 为降序排列。
@@ -1153,8 +1331,10 @@ db.COLLECTION_NAME.find().sort({KEY:1})
 ```
 skip(), limilt(), sort()三个放在一起执行的时候，执行的顺序是先 sort(), 然后是 skip()，最后是显示的 limit()
 
-* 索引
-1. 创建索引
+##### MongoDB索引
+
+###### MongoDB创建索引
+
 ```sql
 db.collection.createIndex(keys, options)
 --1按升序创建索引，-1按降序创建索引
@@ -1175,7 +1355,8 @@ db.values.createIndex({open: 1, close: 1}, {background: true})
 |default_language  |string       |对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语|
 |language_override |string       |对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.|
 
-2. 覆盖索引查询(不从数据库找数据)
+###### MongoDB覆盖索引查询(不从数据库找数据)
+
 ```sql
 --创建索引（旧版本写法）
 db.users.ensureIndex({gender:1,user_name:1})
@@ -1188,8 +1369,9 @@ db.users.find({gender:"M"},{user_name:1})
 以下的查询，不能使用覆盖索引查询：
 1. 所有索引字段是一个数组
 2. 所有索引字段是一个子文档
----
-3. 索引子文档字段
+
+
+###### MongoDB索引子文档字段
 
 ```sql
 {
@@ -1215,7 +1397,8 @@ db.users.find({"address.state":"California","address.city":"Los Angeles"})
 db.users.find({"address.city":"Los Angeles","address.state":"California","address.pincode":"123"})
 ```
 
-4. 索引限制
+###### MongoDB索引限制
+
 * 查询限制
 
 索引不能被以下的查询使用：
@@ -1233,8 +1416,9 @@ db.users.find({"address.city":"Los Angeles","address.state":"California","addres
 1. 集合中索引不能超过64个
 2. 索引名的长度不能超过128个字符
 3. 一个复合索引最多可以有31个字段
----
-* aggregate聚合
+
+
+##### aggregate聚合
 
 用于处理数据(如统计平均值,求和，聚类等)，并返回计算后的数据结果。类似sql语句中的 count和group by。
 
@@ -1255,7 +1439,7 @@ select by_user as _id, count(*) as num_tutorial from mycol group by by_user
 |$first   |根据资源文档的排序获取第一个文档数据。       |db.mycol.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}])|
 |$last    |根据资源文档的排序获取最后一个文档数据。     |db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])|
 
-* 管道
+##### MongoDB管道
 
 MongoDB的聚合管道将MongoDB文档在一个管道处理完毕后将结果传递给下一个管道处理。管道操作是可以重复的。
 
@@ -1316,9 +1500,9 @@ db.getCollection('m_msg_tb').aggregate(
  * $millisecond：返回该日期的毫秒部分（0 到 999）。
  * $dateToString： { $dateToString: { format: , date: } }。
 
-5. 技术与原理
+#### MongoDB技术与原理
 
-* 复制（副本集）
+##### MongoDB复制（副本集）
 
 用途：
 * 保障数据的安全性
@@ -1353,7 +1537,7 @@ MongoDB中你只能通过主节点将Mongo服务添加到副本集中， 判断�
 
 MongoDB的副本集与我们常见的主从有所不同，主从在主机宕机后所有服务将停止，而副本集在主机宕机后，副本会接管主节点成为主节点，不会出现宕机的情况。
 
-* 分片
+##### MongoDB分片
 
 当MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。
 ```text
@@ -1365,6 +1549,7 @@ Shard Server 3：27022
 Shard Server 4：27023
 Config Server ：27100
 Route Process：40000
+
 步骤一：启动Shard Server
 
 [root@100 /]# mkdir -p /www/mongoDB/shard/s0
@@ -1414,15 +1599,18 @@ mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
 
 # mkdir /data/db2
 # nohup mongod --port 27021 --dbpath=/data/db2 --logpath=/data/log/rs0-2.log --logappend --fork --shardsvr --replSet=rs0 &
+
 1.1 复制集rs0配置
 
 # mongo localhost:27020 > rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27020'}, {_id: 1, host: 'localhost:27021'}]}) > rs.isMaster() #查看主从关系
+
 2. 创建Sharding复制集 rs1
 
 # mkdir /data/db3
 # nohup mongod --port 27030 --dbpath=/data/db3 --logpath=/data/log/rs1-1.log --logappend --fork --shardsvr --replSet=rs1 &
 # mkdir /data/db4
 # nohup mongod --port 27031 --dbpath=/data/db4 --logpath=/data/log/rs1-2.log --logappend --fork --shardsvr --replSet=rs1 &
+
 2.1 复制集rs1配置
 
 # mongo localhost:27030
@@ -1434,6 +1622,7 @@ mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
 # nohup mongod --port 27100 --dbpath=/data/conf1 --logpath=/data/log/conf-1.log --logappend --fork --configsvr --replSet=conf &
 # mkdir /data/conf2
 # nohup mongod --port 27101 --dbpath=/data/conf2 --logpath=/data/log/conf-2.log --logappend --fork --configsvr --replSet=conf &
+
 3.1 复制集conf配置
 
 # mongo localhost:27100
@@ -1442,6 +1631,7 @@ mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
 4. 创建Route
 
 # nohup mongos --port 40000 --configdb conf/localhost:27100,localhost:27101 --fork --logpath=/data/log/route.log --logappend & 
+
 4.1 设置分片
 
 # mongo localhost:40000
@@ -1452,7 +1642,7 @@ mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
 > db.runCommand({ shardcollection: 'test.user', key: {name: 1}})
 ```
 
-* 备份(mongodump)与恢复(mongorestore)
+##### MongoDB备份(mongodump)与恢复(mongorestore)
 
 1. 备份:
 
@@ -1498,9 +1688,7 @@ mongorestore 最后的一个参数，设置备份数据所在位置，例如：c
 
 你不能同时指定 \<path\> 和 --dir 选项。
 
----
-
-* 监控
+##### MongoDB监控
 
 mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。
 
@@ -1512,7 +1700,7 @@ D:\set up\mongodb\bin>mongotop
 
 E:\mongodb-win32-x86_64-2.2.1\bin>mongotop 10
 
-后面的10是<sleeptime>参数 ，可以不使用，等待的时间长度，以秒为单位，mongotop等待调用之间。通过的默认mongotop返回数据的每一秒。
+后面的10是\<sleeptime>参数 ，可以不使用，等待的时间长度，以秒为单位，mongotop等待调用之间。通过的默认mongotop返回数据的每一秒。
 
  E:\mongodb-win32-x86_64-2.2.1\bin>mongotop --locks
 
@@ -1533,11 +1721,11 @@ mongod花费的时间工作在这个命名空间提供总额。
 * write：
 提供这个命名空间进行写操作，这mongod花了大量的时间。
 
-6. 高级应用
+#### MongoDB高级应用
 
-* 关系
+##### MongoDB关系
 
-1. 嵌入式关系
+###### 嵌入式关系
 
 保存在单一的文档中，可以比较容易的获取和维护数据
 ```text
@@ -1566,7 +1754,7 @@ mongod花费的时间工作在这个命名空间提供总额。
 db.users.findOne({"name":"Tom Benzamin"},{"address":1})
 ```
 
-2. 引用式关系
+###### 引用式关系
 
 把用户数据文档和用户地址数据文档分开，通过引用文档的 id 字段来建立关系。
 ```text
@@ -1612,7 +1800,8 @@ var dbRef = user.address
 db[dbRef.$ref].findOne({"_id":(dbRef.$id)})
 ```
 
-* 查询分析
+##### MongoDB查询分析
+
 ```sql
 db.users.find({gender:"M"},{user_name:1,_id:0}).explain()
 db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1})
@@ -1624,8 +1813,9 @@ db.users.find({gender:"M"},{user_name:1,_id:0}).hint({gender:1,user_name:1}).exp
 * nscanned/nscannedObjects：表明当前这次查询一共扫描了集合中多少个文档，我们的目的是，让这个数值和返回文档的数量越接近越好。
 * millis：当前查询所需时间，毫秒数。
 * indexBounds：当前查询具体使用的索引。
----
-* 原子操作
+
+##### MongoDB原子操作
+
 ```sql
 --判断是否可结算并更新新的结算信息
 db.books.findAndModify ( {
@@ -1640,56 +1830,77 @@ db.books.findAndModify ( {
 } )
 ```
 
-* $set
+###### $set
+
 ```sql
 用来指定一个键并更新键值，若键不存在并创建。
 { $set : { field : value } }
 ```
-* $unset
+
+###### $unset
+
 ```sql
 用来删除一个键。
 { $unset : { field : 1} }
 ```
-* $inc
+
+###### $inc
+
 ```sql
 $inc可以对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。
 { $inc : { field : value } }
 ```
-* $push
+
+###### $push
+
 ```sql
 --把value追加到field里面去，field一定要是数组类型才行，如果field不存在，会新增一个数组类型加进去。
 { $push : { field : value } }
 ```
-* $pushAll
+
+###### $pushAll
+
 ```sql
 --同$push,只是一次可以追加多个值到一个数组字段内。
 { $pushAll : { field : value_array } }
 ```
-* $pull
+
+###### $pull
+
 ```sql
 --从数组field内删除一个等于value值。
 { $pull : { field : _value } }
 ```
-* $addToSet
+
+###### $addToSet
+
 ```
 增加一个值到数组内，而且只有当这个值不在数组内才增加。
 ```
-* $pop
+
+###### $pop
+
 ```sql
 --删除数组的第一个或最后一个元素
 { $pop : { field : 1 } }
 ```
-* $rename
+
+###### $rename
+
 ```sql
 --修改字段名称
 { $rename : { old_field_name : new_field_name } }
 ```
-* $bit
+
+###### $bit
+
 ```sql
 --位操作，integer类型
 {$bit : { field : {and : 5}}}
 ```
-* 偏移操作符
+
+###### 偏移操作符
+
 ```sql
 t.find() { "_id" : ObjectId("4b97e62bf1d8c7152c9ccb74"), "title" : "ABC", "comments" : [ { "by" : "joe", "votes" : 3 }, { "by" : "jane", "votes" : 7 } ] }
  
@@ -1697,8 +1908,8 @@ t.update( {'comments.by':'joe'}, {$inc:{'comments.$.votes':1}}, false, true )
  
 t.find() { "_id" : ObjectId("4b97e62bf1d8c7152c9ccb74"), "title" : "ABC", "comments" : [ { "by" : "joe", "votes" : 4 }, { "by" : "jane", "votes" : 7 } ] }
 ```
----
-* Map Reduce 大型聚合查询
+
+###### Map_Reduce大型聚合查询
 
 Map-Reduce是一种计算模型，将大批量的工作（数据）分解（MAP）执行，然后再将结果合并成最终结果（REDUCE）。
 
@@ -1725,8 +1936,7 @@ db.collection.mapReduce(
 
 ![Map Reduce](map-reduce.bakedsvg.svg)
 
----
-* 全文检索
+##### MongoDB全文检索
 
 1. 启用
 
@@ -1793,8 +2003,7 @@ $regex操作符中的option选项可以改变正则匹配的默认行为，它�
 * i，m，x，s可以组合使用，例如:{name:{$regex:/j*k/,$options:"si"}}
 在设置索弓}的字段上进行正则匹配可以提高查询速度，而且当正则表达式使用的是前缀表达式时，查询速度会进一步提高，例如:{name:{$regex: /^joe/}
 
----
-* GridFS
+##### GridFS
 
 GridFS 用于存储和恢复那些超过16M（BSON文件限制）的文件(如：图片、音频、视频等)。
 
@@ -1845,7 +2054,7 @@ db.fs.files.find()
 db.fs.chunks.find({files_id:ObjectId('534a811bf8b4aa4d33fdf94d')})
 ```
 
-* 固定集合（Capped Collections）
+##### MongoDB固定集合（Capped_Collections）
 
 固定集合是性能出色且有着固定大小的集合，就像一个环形队列，当集合空间用完后，再插入的元素就会覆盖最初始的头部的元素
 
@@ -1881,7 +2090,7 @@ db.runCommand({"convertToCapped":"posts",size:10000})
 db.cappedLogCollection.find().sort({$natural:-1})
 ```
 
-* _id 自动增长
+##### MongoDB_id自动增长
 
 使用 counters 集合
 ```sql
@@ -1910,213 +2119,212 @@ db.products.find()
 
 ### redis
 
-1. 概述
+#### redis概述
 
-    redis 是完全开源免费的，遵守BSD协议，是一个高性能的key-value数据库。
+redis 是完全开源免费的，遵守BSD协议，是一个高性能的key-value数据库。
 
-    Redis 与其他 key - value 缓存产品有以下三个特点：
+Redis 与其他 key - value 缓存产品有以下三个特点：
 
-    * Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
-    * Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
-    * Redis支持数据的备份，即master-slave模式的数据备份。
+* Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
+* Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
+* Redis支持数据的备份，即master-slave模式的数据备份。
 
-    优势：
+优势：
 
-    * 性能极高 – Redis能读的速度是110000次/s,写的速度是81000次/s 。
-    丰富的数据类型 – Redis支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。
-    * 原子 – Redis的所有操作都是原子性的，意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过MULTI和EXEC指令包起来。
-    * 丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。
+* 性能极高 – Redis能读的速度是110000次/s,写的速度是81000次/s 。
+丰富的数据类型 – Redis支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。
+* 原子 – Redis的所有操作都是原子性的，意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过MULTI和EXEC指令包起来。
+* 丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。
 
-2. 安装
+#### redis安装
 
-    官网下载安装
+官网下载安装
 
-    启动：redis-server.exe redis.windows.conf
+启动：redis-server.exe redis.windows.conf
 
-    客户端启动：redis-cli.exe (不修改配置的话默认即可)
+客户端启动：redis-cli.exe (不修改配置的话默认即可)
 
-    redis-cli.exe -h 127.0.0.1 -p 6379 -a password
+redis-cli.exe -h 127.0.0.1 -p 6379 -a password
 
-    * 基本文件
+#### redis基本文件
 
-        * redis-server:redis服务
-        * redis-cli:redis命令行工具
-        * redis-benchmark:基准性能测试工具
-        * redis-check-aof:AOF持久化文件检测和修复工具
-        * redis-check-dump:RDB持久化文件检测和修复工具
-        * redis-sentinel:启动哨兵
-        * redis-trib:cluster集群构建工具
+* redis-server:redis服务
+* redis-cli:redis命令行工具
+* redis-benchmark:基准性能测试工具
+* redis-check-aof:AOF持久化文件检测和修复工具
+* redis-check-dump:RDB持久化文件检测和修复工具
+* redis-sentinel:启动哨兵
+* redis-trib:cluster集群构建工具
 
+#### redis基础命令
 
-    * 基础命令
+* keys *:redis允许模糊查询key　　有3个通配符 *、?、[]
+* del key:删除key
+* exists kxm:判断是否存在
+* expire key 20:设置过期时间 - 秒
+* pexpire key 20000:设置过期时间 - 毫秒
+* move kxm 2:移动key到指定位置库中 2号库
+* persist key:移除过期时间，key将会永久存在 成功设置返回1 否则返回0
+* pttl key:以毫秒为单位返回 key 的剩余的过期时间
+* ttl key:以秒为单位，返回给定 key 的剩余生存时间
+* randomkey:从当前数据库中随机返回一个 key
+* rename key newkxy:更改key的名字，如果重复了会覆盖
+* renamenx kxm key:仅当 newkey 不存在时，将 key 改名为 newkey
+* type key:返回 key 所储存的值的类型
+* select 0:选择第一个库
+* ping:返回PONG 表示连接正常
+* quit:关闭当前连接
 
-        * keys *:redis允许模糊查询key　　有3个通配符 *、?、[]
-        * del key:删除key
-        * exists kxm:判断是否存在
-        * expire key 20:设置过期时间 - 秒
-        * pexpire key 20000:设置过期时间 - 毫秒
-        * move kxm 2:移动key到指定位置库中 2号库
-        * persist key:移除过期时间，key将会永久存在 成功设置返回1 否则返回0
-        * pttl key:以毫秒为单位返回 key 的剩余的过期时间
-        * ttl key:以秒为单位，返回给定 key 的剩余生存时间
-        * randomkey:从当前数据库中随机返回一个 key
-        * rename key newkxy:更改key的名字，如果重复了会覆盖
-        * renamenx kxm key:仅当 newkey 不存在时，将 key 改名为 newkey
-        * type key:返回 key 所储存的值的类型
-        * select 0:选择第一个库
-        * ping:返回PONG 表示连接正常
-        * quit:关闭当前连接
+#### redis字符串命令
 
-    * 字符串命令
+* set key aaa:设置指定 key 的值
+* get key:获取指定 key 的值
+* getrange key 0 1:返回 key 中字符串值的子字符 包含 0 和 1 包含关系
+* getset key aaaaaaaa:将给定 key 的值设为 value ，并返回 key 的旧值(old value)
+* mget key kxm:获取所有(一个或多个)给定 key 的值
+* setex test 5 "this is my test":将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
+* setnx test test:只有在 key 不存在时设置 key 的值 （用于分布式锁）
+* strlen test:返回 key 所储存的字符串值的长度
+* mset key1 "1" key2 "2":同时设置一个或多个 key-value 对
+* msetnx key3 "a" key2 "b":同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在 其中一个失败则全部失败
+* incr key:将 key 中储存的数字值增一 -> key的值 比如为 数字类型字符串 返回增加后的结果
+* incrby num 1000:将 key 中储存的数字值增指定的值 -> key的值 比如为 数字类型字符串 返回增加后的结果
+* decr key:同 -> 减一
+* decrby num 500:同 -> 减指定值
+* append key 1123123:如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾 返回字符串长度
 
-        * set key aaa:设置指定 key 的值
-        * get key:获取指定 key 的值
-        * getrange key 0 1:返回 key 中字符串值的子字符 包含 0 和 1 包含关系
-        * getset key aaaaaaaa:将给定 key 的值设为 value ，并返回 key 的旧值(old value)
-        * mget key kxm:获取所有(一个或多个)给定 key 的值
-        * setex test 5 "this is my test":将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
-        * setnx test test:只有在 key 不存在时设置 key 的值 （用于分布式锁）
-        * strlen test:返回 key 所储存的字符串值的长度
-        * mset key1 "1" key2 "2":同时设置一个或多个 key-value 对
-        * msetnx key3 "a" key2 "b":同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在 其中一个失败则全部失败
-        * incr key:将 key 中储存的数字值增一 -> key的值 比如为 数字类型字符串 返回增加后的结果
-        * incrby num 1000:将 key 中储存的数字值增指定的值 -> key的值 比如为 数字类型字符串 返回增加后的结果
-        * decr key:同 -> 减一
-        * decrby num 500:同 -> 减指定值
-        * append key 1123123:如果 key 已经存在并且是一个字符串， APPEND 命令将指定的 value 追加到该 key 原来值（value）的末尾 返回字符串长度
+#### redis哈希(Hash)命令
 
-    * 哈希(Hash)命令
+* hdel key field1 [field2]:删除一个或多个哈希表字段
+* hexistskey field:查看哈希表 key 中，指定的字段是否存在
+* hget key field:获取存储在哈希表中指定字段的值
+* hgetall key:获取在哈希表中指定 key 的所有字段和值
+* hincrby hash yeary 1:为哈希表 key 中的指定字段的整数值加上增量 increment
+* hkeys hash:获取所有哈希表中的字段
+* hlen hash:获取哈希表中字段的数量
+* hmget hash name year:获取所有给定字段的值
+* hmset hash name "i am kxm" year 24:同时将多个 field-value (域-值)对设置到哈希表 key 中
+* hset hash name kxm:将哈希表 key 中的字段 field 的值设为 value
+* hsetnx key field value:只有在字段 field 不存在时，设置哈希表字段的值
+* hvals hash:获取哈希表中所有值
+* hexists hash name:是否存在
 
-        * hdel key field1 [field2]:删除一个或多个哈希表字段
-        * hexistskey field:查看哈希表 key 中，指定的字段是否存在
-        * hget key field:获取存储在哈希表中指定字段的值
-        * hgetall key:获取在哈希表中指定 key 的所有字段和值
-        * hincrby hash yeary 1:为哈希表 key 中的指定字段的整数值加上增量 increment
-        * hkeys hash:获取所有哈希表中的字段
-        * hlen hash:获取哈希表中字段的数量
-        * hmget hash name year:获取所有给定字段的值
-        * hmset hash name "i am kxm" year 24:同时将多个 field-value (域-值)对设置到哈希表 key 中
-        * hset hash name kxm:将哈希表 key 中的字段 field 的值设为 value
-        * hsetnx key field value:只有在字段 field 不存在时，设置哈希表字段的值
-        * hvals hash:获取哈希表中所有值
-        * hexists hash name:是否存在
+#### redis列表(List)命令
 
-    * 列表(List)命令
+Redis列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素到列表的头部（左边）或者尾部（右边）
 
-        Redis列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素到列表的头部（左边）或者尾部（右边）
+一个列表最多可以包含 2^32 - 1 个元素 (4294967295, 每个列表超过40亿个元素)
 
-        一个列表最多可以包含 2^32 - 1 个元素 (4294967295, 每个列表超过40亿个元素)
+容量 -> 集合,有序集合也是如此
 
-        容量 -> 集合,有序集合也是如此
+* lpush list php:将一个值插入到列表头部 返回列表长度
+* lindex list 0:通过索引获取列表中的元素
+* blpop key1 [key2 ] timeout:移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+* brpop key1 [key2 ] timeout:移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+* linsert list before 3 4:在值 3 前插入 4 前即为顶
+* linsert list after 4 5:在值4 后插入5
+* llen list:获取列表长度
+* lpop list:移出并获取列表的第一个元素
+* lpush list c++ c:将一个或多个值插入到列表头部
+* lrange list 0 1:获取列表指定范围内的元素 包含0和1 -1 代表所有 （lrange list 0 -1）
+* lrem list 1 c:移除list 集合中 值为 c 的 一个元素， 1 代表count 即移除几个
+* lset list 0 "this is update":通过索引设置列表元素的值
+* ltrim list 1 5:对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
+* rpop list:移除列表的最后一个元素，返回值为移除的元素
+* rpush list newvalue3:从底部添加新值
+* rpoplpush list list2:转移列表的数据
 
-        * lpush list php:将一个值插入到列表头部 返回列表长度
-        * lindex list 0:通过索引获取列表中的元素
-        * blpop key1 [key2 ] timeout:移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-        * brpop key1 [key2 ] timeout:移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-        * linsert list before 3 4:在值 3 前插入 4 前即为顶
-        * linsert list after 4 5:在值4 后插入5
-        * llen list:获取列表长度
-        * lpop list:移出并获取列表的第一个元素
-        * lpush list c++ c:将一个或多个值插入到列表头部
-        * lrange list 0 1:获取列表指定范围内的元素 包含0和1 -1 代表所有 （lrange list 0 -1）
-        * lrem list 1 c:移除list 集合中 值为 c 的 一个元素， 1 代表count 即移除几个
-        * lset list 0 "this is update":通过索引设置列表元素的值
-        * ltrim list 1 5:对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
-        * rpop list:移除列表的最后一个元素，返回值为移除的元素
-        * rpush list newvalue3:从底部添加新值
-        * rpoplpush list list2:转移列表的数据
+#### redis集合(Set)命令
 
-    * 集合(Set)命令
+Set 是 String 类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据
 
-        Set 是 String 类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据
+* sadd set java php c c++ python:向集合添加一个或多个成员
+* scard set:获取集合的成员数
+* sdiff key1 [key2]:返回给定所有集合的差集 数学含义差集
+* sdiffstore curr set newset （sdiffstore destination key1 [key2]）:把set和 newset的差值存储到curr中
+* sinter set newset:返回给定所有集合的交集
+* sinterstore curr set newset （sinterstoredestination key1 [key2]）:同
+* sismember set c#:判断 member 元素是否是集合 key 的成员
+* smembers set:返回集合中的所有成员
+* srandmember set 2:随机抽取两个key (抽奖实现美滋滋)
+* smove set newtest java （smove source destination member）:将 member 元素从 source 集合移动到 destination 集合
+* sunion set newset:返回所有给定集合的并集
+* srem set java:删除
+* spop set:从集合中弹出一个元素
+* sdiff | sinter | sunion:操作：集合间运算：差集
 
-        * sadd set java php c c++ python:向集合添加一个或多个成员
-        * scard set:获取集合的成员数
-        * sdiff key1 [key2]:返回给定所有集合的差集 数学含义差集
-        * sdiffstore curr set newset （sdiffstore destination key1 [key2]）:把set和 newset的差值存储到curr中
-        * sinter set newset:返回给定所有集合的交集
-        * sinterstore curr set newset （sinterstoredestination key1 [key2]）:同
-        * sismember set c#:判断 member 元素是否是集合 key 的成员
-        * smembers set:返回集合中的所有成员
-        * srandmember set 2:随机抽取两个key (抽奖实现美滋滋)
-        * smove set newtest java （smove source destination member）:将 member 元素从 source 集合移动到 destination 集合
-        * sunion set newset:返回所有给定集合的并集
-        * srem set java:删除
-        * spop set:从集合中弹出一个元素
-        * sdiff | sinter | sunion:操作：集合间运算：差集
+#### redis有序集合(sorted_set)命令
 
-    * 有序集合(sorted set)命令
+Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员。
 
-        Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员。
+不同的是每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。
 
-        不同的是每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。
+有序集合的成员是唯一的,但分数(score)却可以重复。
 
-        有序集合的成员是唯一的,但分数(score)却可以重复。
+* zadd sort 1 java 2 python:向有序集合添加一个或多个成员，或者更新已存在成员的分数
+* zcard sort:获取有序集合的成员数
+* zcount sort 0 1:计算在有序集合中指定区间分数的成员数
+* zincrby sort 500 java:有序集合中对指定成员的分数加上增量 increment
+* zscore sort java:返回有序集中，成员的分数值
+* zrange sort 0 -1:获取指定序号的值，-1代表全部
+* zrangebyscore sort 0 5:分数符合范围的值
+* zrangebyscore sort 0 5 limit 0 1:分页 limit 0代表页码，1代表每页显示数量
+* zrem sort java:移除元素
+* zremrangebyrank sort 0 1:按照排名范围删除元素
+* zremrangebyscore sort 0 1:按照分数范围删除元素
+* zrevrank sort c#:返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
 
-        * zadd sort 1 java 2 python:向有序集合添加一个或多个成员，或者更新已存在成员的分数
-        * zcard sort:获取有序集合的成员数
-        * zcount sort 0 1:计算在有序集合中指定区间分数的成员数
-        * zincrby sort 500 java:有序集合中对指定成员的分数加上增量 increment
-        * zscore sort java:返回有序集中，成员的分数值
-        * zrange sort 0 -1:获取指定序号的值，-1代表全部
-        * zrangebyscore sort 0 5:分数符合范围的值
-        * zrangebyscore sort 0 5 limit 0 1:分页 limit 0代表页码，1代表每页显示数量
-        * zrem sort java:移除元素
-        * zremrangebyrank sort 0 1:按照排名范围删除元素
-        * zremrangebyscore sort 0 1:按照分数范围删除元素
-        * zrevrank sort c#:返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+#### redis发布订阅
 
-    * 发布订阅
+A客户端订阅频道： subscribe redisChat （频道名字为 redisChat）
 
-        A客户端订阅频道： subscribe redisChat （频道名字为 redisChat）
+B客户端发布内容： publish redisChat "Hello, this is my wor"
 
-        B客户端发布内容： publish redisChat "Hello, this is my wor"
+* pubsub channels:查看当前redis 有多少个频道
+* pubsub numsub chat1:查看某个频道的订阅者数量
+* unsubscrible chat1:退订指定频道
+* psubscribe java.*:订阅一组频道
 
-        * pubsub channels:查看当前redis 有多少个频道
-        * pubsub numsub chat1:查看某个频道的订阅者数量
-        * unsubscrible chat1:退订指定频道
-        * psubscribe java.*:订阅一组频道
+#### redis事务
 
-    * 事务
+* redis 事务可以一次执行多个命令， 并且带有以下三个重要的保证：
 
-        * redis 事务可以一次执行多个命令， 并且带有以下三个重要的保证：
+    * 批量操作在发送 EXEC 命令前被放入队列缓存
+    * 收到 EXEC 命令后进入事务执行，事务中任意命令执行失败，其余的命令依然被执行
+    * 在事务执行过程，其他客户端提交的命令请求不会插入到事务执行命令序列中
+    
+* 一个事务从开始到执行会经历以下三个阶段：
 
-            * 批量操作在发送 EXEC 命令前被放入队列缓存
-            * 收到 EXEC 命令后进入事务执行，事务中任意命令执行失败，其余的命令依然被执行
-            * 在事务执行过程，其他客户端提交的命令请求不会插入到事务执行命令序列中
-            
-        * 一个事务从开始到执行会经历以下三个阶段：
+    * 开始事务
+    * 命令入队
+    * 执行事务
 
-            * 开始事务
-            * 命令入队
-            * 执行事务
+* multi:标记一个事务开始
+* exec:执行事务
+* discard:事务开始后输入命令入队过程中，中止事务
+* watch key:监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断
+* unwatch:取消 WATCH 命令对所有 key 的监视
 
-        * multi:标记一个事务开始
-        * exec:执行事务
-        * discard:事务开始后输入命令入队过程中，中止事务
-        * watch key:监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断
-        * unwatch:取消 WATCH 命令对所有 key 的监视
+#### redis服务器命令
 
-    * 服务器命令
+* flushall:删除所有数据库的所有key
+* flushdb:删除当前数据库的所有key
+* save:同步保存数据到硬盘
 
-        * flushall:删除所有数据库的所有key
-        * flushdb:删除当前数据库的所有key
-        * save:同步保存数据到硬盘
+#### redis数据备份与恢复
 
-    * 数据备份与恢复
+SAVE 命令用于创建当前数据库的备份
 
-        SAVE 命令用于创建当前数据库的备份
+如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可。获取 redis 目录可以使用 CONFIG 命令
 
-        如果需要恢复数据，只需将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可。获取 redis 目录可以使用 CONFIG 命令
+#### redis性能测试
 
-    * 性能测试
+```sql
+redis目录执行：redis-benchmark [option] [option value]
 
-        ```sql
-        redis目录执行：redis-benchmark [option] [option value]
+// 会返回各种操作的性能报告（100连接，10000请求）
+redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 10000
 
-        // 会返回各种操作的性能报告（100连接，10000请求）
-        redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 10000
-
-        // 100个字节作为value值进行压测
-        redis-benchmark -h 127.0.0.1 -p 6379 -q -d 100
-        ```
+// 100个字节作为value值进行压测
+redis-benchmark -h 127.0.0.1 -p 6379 -q -d 100
+```
